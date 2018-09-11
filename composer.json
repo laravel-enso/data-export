@@ -15,7 +15,7 @@
             "email": "aocneanu@gmail.com",
             "homepage": "https://laravel-enso.com",
             "role": "Developer"
-        },
+        }
     ],
     "require": {
         "php": ">=7.1.0",
