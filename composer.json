@@ -1,0 +1,41 @@
+{
+    "name": "laravel-enso/dataexport",
+    "description": "Structure for holding Laravel-Enso exports",
+    "keywords": [
+        "data-export",
+        "laravel-enso",
+        "enso-exports"
+    ],
+    "homepage": "https://github.com/laravel-enso/DataExport",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adrian Ocneanu",
+            "email": "aocneanu@gmail.com",
+            "homepage": "https://laravel-enso.com",
+            "role": "Developer"
+        },
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "laravel/framework": "5.7.*",
+        "laravel-enso/filemanager": "2.5.*",
+        "laravel-enso/helpers": "1.8.*"
+    },
+    "require-dev": {
+        "laravel-enso/testhelper": "1.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelEnso\\DataExport\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelEnso\\DataExport\\AppServiceProvider"
+            ]
+        }
+    }
+}
