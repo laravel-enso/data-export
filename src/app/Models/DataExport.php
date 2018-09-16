@@ -12,8 +12,6 @@ class DataExport extends Model implements Attachable, VisibleFile
 {
     use HasFile, CreatedBy;
 
-    protected $fillable = ['type'];
-
     public function folder()
     {
         return config('enso.config.paths.exports');
