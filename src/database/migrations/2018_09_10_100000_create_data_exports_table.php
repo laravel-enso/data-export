@@ -11,9 +11,8 @@ class CreateDataExportsTable extends Migration
         Schema::create('data_exports', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('created_by')->unsigned();
-            $table->foreign('created_by')->references('id')
-                ->on('users');
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->foreign('created_by')->references('id')->on('users');
 
             $table->timestamps();
         });

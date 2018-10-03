@@ -21,6 +21,7 @@
         "php": ">=7.1.0",
         "laravel/framework": "5.7.*",
         "laravel-enso/filemanager": "2.5.*",
+        "laravel-enso/trackwho": "1.6.*",
         "laravel-enso/helpers": "1.8.*"
     },
     "require-dev": {
