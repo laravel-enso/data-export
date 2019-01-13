@@ -22,7 +22,7 @@
         "laravel/framework": "5.7.*",
         "laravel-enso/filemanager": "2.5.*",
         "laravel-enso/trackwho": "1.7.*",
-        "laravel-enso/helpers": "1.9.*"
+        "laravel-enso/helpers": "1.10.*"
     },
     "autoload": {
         "psr-4": {

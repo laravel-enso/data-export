@@ -11,6 +11,14 @@ class CreateDataExportsTable extends Migration
         Schema::create('data_exports', function (Blueprint $table) {
             $table->increments('id');
 
+            $table->string('type');
+            $table->integer('entries')->nullable();
+            $table->integer('status')->nullable();
+
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->foreign('created_by')->references('id')
+                ->on('users');
+
             $table->timestamps();
         });
     }
