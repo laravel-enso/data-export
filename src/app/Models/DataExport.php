@@ -14,7 +14,7 @@ class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 {
     use CreatedBy, HasFile;
 
-    protected $fillable = ['type', 'entries', 'status'];
+    protected $fillable = ['name', 'entries', 'status'];
 
     public function folder()
     {
@@ -28,7 +28,7 @@ class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 
     public function name()
     {
-        return $this->type;
+        return $this->name;
     }
 
     public function entries()
