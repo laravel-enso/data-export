@@ -19,7 +19,7 @@ class DataExport extends JsonResource
             'since' => $this->created_at,
             'owner' => $this->whenLoaded(
                 'createdBy', new TrackWho($this->createdBy)
-            )
+            ),
         ];
     }
 }
