@@ -40,4 +40,9 @@ class DataExport extends Model implements Attachable, VisibleFile, IOOperation
     {
         return IOTypes::Export;
     }
+
+    public function status()
+    {
+        return $this->status;
+    }
 }
