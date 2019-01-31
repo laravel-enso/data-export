@@ -9,10 +9,11 @@ use LaravelEnso\Core\app\Contracts\IOOperation;
 use LaravelEnso\FileManager\app\Traits\HasFile;
 use LaravelEnso\FileManager\app\Contracts\Attachable;
 use LaravelEnso\FileManager\app\Contracts\VisibleFile;
+use LaravelEnso\Multitenancy\app\Traits\SystemConnection;
 
 class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 {
-    use CreatedBy, HasFile;
+    use CreatedBy, HasFile, SystemConnection;
 
     protected $fillable = ['name', 'entries', 'status'];
 
