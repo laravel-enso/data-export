@@ -2,10 +2,10 @@
 
 namespace LaravelEnso\DataExport\app\Models;
 
+use LaravelEnso\IO\app\Enums\IOTypes;
 use Illuminate\Database\Eloquent\Model;
-use LaravelEnso\Core\app\Enums\IOTypes;
+use LaravelEnso\IO\app\Contracts\IOOperation;
 use LaravelEnso\TrackWho\app\Traits\CreatedBy;
-use LaravelEnso\Core\app\Contracts\IOOperation;
 use LaravelEnso\FileManager\app\Traits\HasFile;
 use LaravelEnso\FileManager\app\Contracts\Attachable;
 use LaravelEnso\FileManager\app\Contracts\VisibleFile;
