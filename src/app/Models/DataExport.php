@@ -10,18 +10,16 @@ use LaravelEnso\TrackWho\app\Traits\CreatedBy;
 use LaravelEnso\FileManager\app\Traits\HasFile;
 use LaravelEnso\FileManager\app\Contracts\Attachable;
 use LaravelEnso\FileManager\app\Contracts\VisibleFile;
-use LaravelEnso\Multitenancy\app\Traits\MixedConnection;
-use LaravelEnso\Multitenancy\app\Traits\ConnectionStoragePath;
 
 class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 {
-    use ConnectionStoragePath, CreatedBy, HasIOStatuses, HasFile, MixedConnection;
+    use CreatedBy, HasIOStatuses, HasFile;
 
     protected $fillable = ['name', 'entries', 'status'];
 
     public function folder()
     {
-        return $this->storagePath('exports');
+        return config('enso.config.paths.exports');
     }
 
     public function isDeletable()
