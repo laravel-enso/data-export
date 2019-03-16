@@ -32,6 +32,10 @@ Depends on:
  - [TrackWho](https://github.com/laravel-enso/TrackWho) for keeping track of the users doing the imports
 
 
+### Configuration & Usage
+
+Be sure to check out the full documentation for this package available at [docs.laravel-enso.com](https://docs.laravel-enso.com/backend/data-export.html)
+
 ### Contributions
 
 are welcome. Pull requests are great, but issues are good too.
