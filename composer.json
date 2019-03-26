@@ -20,7 +20,7 @@
     "require": {
         "php": ">=7.1.0",
         "laravel/framework": "5.8.*",
-        "laravel-enso/core": "4.0.*",
+        "laravel-enso/core": "4.1.*",
         "laravel-enso/filemanager": "3.0.*",
         "laravel-enso/io": "1.1.*",
         "laravel-enso/trackwho": "1.7.*",
