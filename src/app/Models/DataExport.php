@@ -15,7 +15,7 @@ class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 {
     use CreatedBy, HasIOStatuses, HasFile;
 
-    protected $fillable = ['name', 'entries', 'status'];
+    protected $fillable = ['name', 'entries', 'status', 'created_by'];
 
     public function folder()
     {
