@@ -23,7 +23,6 @@ class AppServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/config/exports.php', 'exports');
 
         return $this;
-
     }
 
     private function publishDependencies()
