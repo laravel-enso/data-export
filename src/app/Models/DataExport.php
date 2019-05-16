@@ -4,12 +4,12 @@ namespace LaravelEnso\DataExport\app\Models;
 
 use LaravelEnso\IO\app\Enums\IOTypes;
 use Illuminate\Database\Eloquent\Model;
+use LaravelEnso\Files\app\Traits\HasFile;
 use LaravelEnso\IO\app\Traits\HasIOStatuses;
 use LaravelEnso\IO\app\Contracts\IOOperation;
 use LaravelEnso\TrackWho\app\Traits\CreatedBy;
-use LaravelEnso\FileManager\app\Traits\HasFile;
-use LaravelEnso\FileManager\app\Contracts\Attachable;
-use LaravelEnso\FileManager\app\Contracts\VisibleFile;
+use LaravelEnso\Files\app\Contracts\Attachable;
+use LaravelEnso\Files\app\Contracts\VisibleFile;
 
 class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 {
@@ -17,12 +17,9 @@ class DataExport extends Model implements Attachable, VisibleFile, IOOperation
 
     protected $fillable = ['name', 'entries', 'status', 'created_by'];
 
-    public function folder()
-    {
-        return config('enso.config.paths.exports');
-    }
+    protected $folder = 'exports';
 
-    public function isDeletable()
+    public function isDeletable(): bool
     {
         return true;
     }

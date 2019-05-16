@@ -1,11 +1,11 @@
 <?php
 
-namespace LaravelEnso\DataExport\app\Classes;
+namespace LaravelEnso\DataExport\app\Services;
 
+use Illuminate\Http\File;
 use Box\Spout\Common\Type;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 use Box\Spout\Writer\WriterFactory;
-use Illuminate\Support\Facades\File;
 use Box\Spout\Writer\Style\StyleBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use LaravelEnso\DataExport\app\Models\DataExport;
@@ -15,6 +15,8 @@ use LaravelEnso\DataExport\Contracts\BeforeExportHook;
 
 class ExcelExport
 {
+    const Extension = 'xlsx';
+
     private $dataExport;
     private $exporter;
     private $filename;
@@ -32,7 +34,6 @@ class ExcelExport
         $this->count = 0;
         $this->sheetCount = 1;
         $this->rowLimit = config('enso.exports.rowLimit');
-        $this->filePath();
     }
 
     public function count()
@@ -78,7 +79,7 @@ class ExcelExport
             ->build();
 
         $this->writer->setDefaultRowStyle($defaultStyle)
-            ->openToFile($this->filePath);
+            ->openToFile($this->filePath());
 
         return $this;
     }
@@ -115,15 +116,20 @@ class ExcelExport
     {
         $this->count += $rows->count();
 
-        if ($this->count % $this->sheetCount > $this->rowLimit) {
-            $this->writer->addNewSheetAndMakeItCurrent();
-            $this->addHeading();
-            $this->sheetCount++;
+        if ($this->needsNewSheet()) {
+            $this->addSheet();
         }
 
         $this->writer->addRows($this->exportRows($rows));
 
         return $this;
+    }
+
+    private function addSheet()
+    {
+        $this->writer->addNewSheetAndMakeItCurrent();
+        $this->addHeading();
+        $this->sheetCount++;
     }
 
     private function exportRows(Collection $rows)
@@ -143,7 +149,11 @@ class ExcelExport
     private function finalize()
     {
         $this->writer->close();
-        $this->dataExport->upload($this->fileToUpload());
+
+        $this->dataExport->attach(
+            new File($this->filePath()), $this->filename
+        );
+
         $this->dataExport->file->created_by = $this->dataExport->created_by;
         $this->dataExport->file->save();
         $this->dataExport->endOperation();
@@ -160,21 +170,23 @@ class ExcelExport
         return $this;
     }
 
-    private function fileToUpload()
+    private function needsNewSheet()
     {
-        return new UploadedFile(
-            $this->filePath, $this->filename,
-            File::mimeType($this->filePath),
-            File::size($this->filePath),
-            0,
-            true
-        );
+        return $this->count % $this->sheetCount > $this->rowLimit;
     }
 
     private function filePath()
     {
-        $this->filePath = storage_path(
-            'app/'.config('enso.config.paths.exports').'/'.$this->filename
-        );
+        return $this->filePath
+            ?? $this->filePath = Storage::path(
+                $this->dataExport->folder()
+                    .DIRECTORY_SEPARATOR
+                    .$this->hashName()
+            );
+    }
+
+    private function hashName()
+    {
+        return Str::random(40).'.'.self::Extension;
     }
 }
