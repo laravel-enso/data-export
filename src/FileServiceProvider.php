@@ -11,6 +11,6 @@ class FileServiceProvider extends ServiceProvider
         'exports' => [
             'model' => DataExport::class,
             'order' => 40,
-        ]
+        ],
     ];
 }
