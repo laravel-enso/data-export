@@ -23,6 +23,7 @@ class ExcelExport
     private $filename;
     private $filePath;
     private $rowLimit;
+    private $chunk;
     private $writer;
     private $count;
     private $sheetCount;
@@ -35,6 +36,7 @@ class ExcelExport
         $this->count = 0;
         $this->sheetCount = 1;
         $this->rowLimit = config('enso.exports.rowLimit');
+        $this->chunk = config('enso.exports.chunk');
     }
 
     public function count()
@@ -45,6 +47,13 @@ class ExcelExport
     public function rowLimit(int $limit)
     {
         $this->rowLimit = $limit;
+
+        return $this;
+    }
+
+    public function chunk(int $chunk)
+    {
+        $this->chunk = $chunk;
 
         return $this;
     }
@@ -105,15 +114,15 @@ class ExcelExport
     {
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById(25000, function ($rows) {
-                $this->chunk($rows)
+            ->chunkById($this->chunk, function ($rows) {
+                $this->addChunk($rows)
                     ->updateProgress();
             });
 
         return $this;
     }
 
-    private function chunk(Collection $rows)
+    private function addChunk(Collection $rows)
     {
         $this->count += $rows->count();
 
