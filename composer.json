@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "box/spout": "2.7.*",
+        "box/spout": "3.0.*",
         "laravel-enso/core": "4.4.*",
         "laravel-enso/files": "3.2.*",
         "laravel-enso/io": "1.2.*",

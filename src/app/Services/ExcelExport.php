@@ -3,14 +3,13 @@
 namespace LaravelEnso\DataExport\app\Services;
 
 use Illuminate\Http\File;
-use Box\Spout\Common\Type;
 use Illuminate\Support\Str;
-use Box\Spout\Writer\WriterFactory;
 use Illuminate\Support\Facades\Storage;
-use Box\Spout\Writer\Style\StyleBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use LaravelEnso\DataExport\app\Models\DataExport;
 use LaravelEnso\DataExport\app\Contracts\ExportsExcel;
+use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use LaravelEnso\DataExport\app\Contracts\AfterExportHook;
 use LaravelEnso\DataExport\app\Contracts\BeforeExportHook;
 
@@ -82,7 +81,7 @@ class ExcelExport
 
     private function initWriter()
     {
-        $this->writer = WriterFactory::create(Type::XLSX);
+        $this->writer = WriterEntityFactory::createXLSXWriter();
 
         $defaultStyle = (new StyleBuilder())
             ->setShouldWrapText(false)
@@ -104,7 +103,7 @@ class ExcelExport
     private function addHeading()
     {
         $this->writer->addRow(
-            $this->exporter->heading()
+            $this->row($this->exporter->heading())
         );
 
         return $this;
@@ -145,7 +144,7 @@ class ExcelExport
     private function exportRows(Collection $rows)
     {
         return $rows->map(function ($row) {
-            return $this->exporter->mapping($row);
+            return $this->row($this->exporter->mapping($row));
         })->toArray();
     }
 
@@ -198,5 +197,10 @@ class ExcelExport
     private function hashName()
     {
         return Str::random(40).'.'.self::Extension;
+    }
+
+    private function row($row)
+    {
+        return WriterEntityFactory::createRowFromArray($row);
     }
 }
