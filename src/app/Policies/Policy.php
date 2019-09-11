@@ -21,7 +21,7 @@ class Policy
     {
         return $this->ownsDataExport($user, $dataExport);
     }
-    
+
     public function share(User $user, DataExport $dataExport)
     {
         return $this->ownsDataExport($user, $dataExport);

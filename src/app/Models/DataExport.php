@@ -2,16 +2,15 @@
 
 namespace LaravelEnso\DataExport\app\Models;
 
-use LaravelEnso\Core\app\Models\User;
 use LaravelEnso\IO\app\Enums\IOTypes;
 use Illuminate\Database\Eloquent\Model;
 use LaravelEnso\Files\app\Traits\HasFile;
 use LaravelEnso\IO\app\Traits\HasIOStatuses;
 use LaravelEnso\IO\app\Contracts\IOOperation;
+use LaravelEnso\Files\app\Traits\FilePolicies;
 use LaravelEnso\TrackWho\app\Traits\CreatedBy;
 use LaravelEnso\Files\app\Contracts\Attachable;
 use LaravelEnso\Files\app\Contracts\AuthorizesFileAcces;
-use LaravelEnso\Files\app\Traits\FilePolicies;
 
 class DataExport extends Model implements Attachable, IOOperation, AuthorizesFileAcces
 {
