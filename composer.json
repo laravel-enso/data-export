@@ -19,12 +19,11 @@
     ],
     "require": {
         "box/spout": "3.0.*",
-        "php": ">=7.1.0",
-        "laravel-enso/core": "4.3.*",
-        "laravel-enso/files": "3.1.*",
+        "laravel-enso/core": "4.4.*",
+        "laravel-enso/files": "3.2.*",
         "laravel-enso/io": "1.2.*",
         "laravel-enso/track-who": "1.8.*",
-        "laravel-enso/helpers": "1.11.*"
+        "laravel-enso/helpers": "1.12.*"
     },
     "autoload": {
         "psr-4": {
@@ -35,6 +34,7 @@
         "laravel": {
             "providers": [
                 "LaravelEnso\\DataExport\\AppServiceProvider",
+                "LaravelEnso\\DataExport\\AuthServiceProvider",
                 "LaravelEnso\\DataExport\\FileServiceProvider"
             ]
         }
