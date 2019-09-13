@@ -10,9 +10,9 @@ use LaravelEnso\IO\app\Contracts\IOOperation;
 use LaravelEnso\Files\app\Traits\FilePolicies;
 use LaravelEnso\TrackWho\app\Traits\CreatedBy;
 use LaravelEnso\Files\app\Contracts\Attachable;
-use LaravelEnso\Files\app\Contracts\AuthorizesFileAcces;
+use LaravelEnso\Files\app\Contracts\AuthorizesFileAccess;
 
-class DataExport extends Model implements Attachable, IOOperation, AuthorizesFileAcces
+class DataExport extends Model implements Attachable, IOOperation, AuthorizesFileAccess
 {
     use CreatedBy, HasIOStatuses, HasFile, FilePolicies;
 
