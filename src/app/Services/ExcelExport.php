@@ -19,7 +19,6 @@ class ExcelExport
 
     private $dataExport;
     private $exporter;
-    private $filename;
     private $filePath;
     private $rowLimit;
     private $chunk;
@@ -27,11 +26,10 @@ class ExcelExport
     private $count;
     private $sheetCount;
 
-    public function __construct(DataExport $dataExport, ExportsExcel $exporter, string $filename)
+    public function __construct(DataExport $dataExport, ExportsExcel $exporter)
     {
         $this->dataExport = $dataExport;
         $this->exporter = $exporter;
-        $this->filename = $filename;
         $this->count = 0;
         $this->sheetCount = 1;
         $this->rowLimit = config('enso.exports.rowLimit');
@@ -160,7 +158,7 @@ class ExcelExport
         $this->writer->close();
 
         $this->dataExport->attach(
-            new File($this->filePath()), $this->filename
+            new File($this->filePath()), $this->exporter->filename()
         );
 
         $this->dataExport->file->created_by = $this->dataExport->created_by;
