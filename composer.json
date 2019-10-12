@@ -23,7 +23,7 @@
         "laravel-enso/files": "3.2.*",
         "laravel-enso/io": "1.2.*",
         "laravel-enso/track-who": "1.8.*",
-        "laravel-enso/helpers": "1.2.*"
+        "laravel-enso/helpers": "1.13.*"
     },
     "autoload": {
         "psr-4": {
