@@ -4,6 +4,7 @@ namespace LaravelEnso\DataExport\app\Services;
 
 use Illuminate\Http\File;
 use Illuminate\Support\Str;
+use LaravelEnso\Core\app\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 use LaravelEnso\DataExport\app\Models\DataExport;
@@ -17,6 +18,7 @@ class ExcelExport
 {
     const Extension = 'xlsx';
 
+    private $user;
     private $dataExport;
     private $exporter;
     private $filePath;
@@ -26,8 +28,9 @@ class ExcelExport
     private $count;
     private $sheetCount;
 
-    public function __construct(DataExport $dataExport, ExportsExcel $exporter)
+    public function __construct(User $user, DataExport $dataExport, ExportsExcel $exporter)
     {
+        $this->user = $user;
         $this->dataExport = $dataExport;
         $this->exporter = $exporter;
         $this->count = 0;
@@ -158,7 +161,7 @@ class ExcelExport
         $this->writer->close();
 
         $this->dataExport->attach(
-            new File($this->filePath()), $this->exporter->filename()
+            new File($this->filePath()), $this->exporter->filename(), $this->user
         );
 
         $this->dataExport->file->created_by = $this->dataExport->created_by;
