@@ -182,7 +182,7 @@ class ExcelExport
 
     private function needsNewSheet()
     {
-        return $this->count % $this->sheetCount > $this->rowLimit;
+        return $this->count > $this->sheetCount * $this->rowLimit;
     }
 
     private function filePath()
