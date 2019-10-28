@@ -14,14 +14,7 @@ For live examples and demos, you may visit [laravel-enso.com](https://www.larave
 
 [![Watch the demo](https://laravel-enso.github.io/data-export/screenshots/bulma_001_thumb.png)](https://laravel-enso.github.io/data-export/screenshots/bulma_001.png)
 
-## Installation
-
-Comes pre-installed in Enso.
-
-## Features
-- creates the structures and statuses necessary during the processes of exporting data
-
-### Configuration & Usage
+### Installation, Configuration & Usage
 
 Be sure to check out the full documentation for this package available at [docs.laravel-enso.com](https://docs.laravel-enso.com/backend/data-export.html)
 
