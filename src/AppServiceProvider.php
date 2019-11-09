@@ -3,8 +3,8 @@
 namespace LaravelEnso\DataExport;
 
 use Illuminate\Support\ServiceProvider;
-use LaravelEnso\IO\app\Observers\IOObserver;
 use LaravelEnso\DataExport\app\Models\DataExport;
+use LaravelEnso\IO\app\Observers\IOObserver;
 
 class AppServiceProvider extends ServiceProvider
 {

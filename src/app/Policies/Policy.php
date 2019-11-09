@@ -2,8 +2,8 @@
 
 namespace LaravelEnso\DataExport\app\Policies;
 
-use LaravelEnso\Core\app\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use LaravelEnso\Core\app\Models\User;
 use LaravelEnso\DataExport\app\Models\DataExport;
 
 class Policy
