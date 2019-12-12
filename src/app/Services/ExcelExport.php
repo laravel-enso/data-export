@@ -16,7 +16,7 @@ use LaravelEnso\DataExport\app\Models\DataExport;
 
 class ExcelExport
 {
-    const Extension = 'xlsx';
+    private const Extension = 'xlsx';
 
     private $user;
     private $dataExport;
