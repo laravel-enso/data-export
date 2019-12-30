@@ -114,7 +114,7 @@ class ExcelExport
     {
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById($this->chunk, fn($rows) => (
+            ->chunkById($this->chunk, fn ($rows) => (
                 $this->addChunk($rows)
                     ->updateProgress()
             ));
@@ -144,7 +144,7 @@ class ExcelExport
 
     private function exportRows(Collection $rows)
     {
-        return $rows->map(fn($row) => $this->row($this->exporter->mapping($row)))
+        return $rows->map(fn ($row) => $this->row($this->exporter->mapping($row)))
             ->toArray();
     }
 
