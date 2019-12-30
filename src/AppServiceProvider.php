@@ -3,8 +3,8 @@
 namespace LaravelEnso\DataExport;
 
 use Illuminate\Support\ServiceProvider;
-use LaravelEnso\DataExport\app\Models\DataExport;
-use LaravelEnso\IO\app\Observers\IOObserver;
+use LaravelEnso\DataExport\App\Models\DataExport;
+use LaravelEnso\IO\App\Observers\IOObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,10 +29,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/config' => config_path('enso'),
-        ], 'data-export-config');
-
-        $this->publishes([
-            __DIR__.'/config' => config_path('enso'),
-        ], 'enso-config');
+        ], ['data-export-config', 'enso-config']);
     }
 }

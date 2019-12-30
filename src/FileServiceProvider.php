@@ -2,7 +2,7 @@
 
 namespace LaravelEnso\DataExport;
 
-use LaravelEnso\DataExport\app\Models\DataExport;
+use LaravelEnso\DataExport\App\Models\DataExport;
 use LaravelEnso\Files\FileServiceProvider as ServiceProvider;
 
 class FileServiceProvider extends ServiceProvider

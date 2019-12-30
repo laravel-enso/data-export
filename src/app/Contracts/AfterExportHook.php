@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelEnso\DataExport\app\Contracts;
+namespace LaravelEnso\DataExport\App\Contracts;
 
 interface AfterExportHook
 {

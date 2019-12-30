@@ -1,10 +1,10 @@
 <?php
 
-namespace LaravelEnso\DataExport\app\Policies;
+namespace LaravelEnso\DataExport\App\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use LaravelEnso\Core\app\Models\User;
-use LaravelEnso\DataExport\app\Models\DataExport;
+use LaravelEnso\Core\App\Models\User;
+use LaravelEnso\DataExport\App\Models\DataExport;
 
 class Policy
 {

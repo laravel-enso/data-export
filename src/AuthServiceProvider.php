@@ -3,8 +3,8 @@
 namespace LaravelEnso\DataExport;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use LaravelEnso\DataExport\app\Models\DataExport;
-use LaravelEnso\DataExport\app\Policies\Policy;
+use LaravelEnso\DataExport\App\Models\DataExport;
+use LaravelEnso\DataExport\App\Policies\Policy;
 
 class AuthServiceProvider extends ServiceProvider
 {

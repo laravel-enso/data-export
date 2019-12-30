@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelEnso\DataExport\app\Services;
+namespace LaravelEnso\DataExport\App\Services;
 
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaravelEnso\Core\app\Models\User;
-use LaravelEnso\DataExport\app\Contracts\AfterExportHook;
-use LaravelEnso\DataExport\app\Contracts\BeforeExportHook;
-use LaravelEnso\DataExport\app\Contracts\ExportsExcel;
-use LaravelEnso\DataExport\app\Models\DataExport;
+use LaravelEnso\Core\App\Models\User;
+use LaravelEnso\DataExport\App\Contracts\AfterExportHook;
+use LaravelEnso\DataExport\App\Contracts\BeforeExportHook;
+use LaravelEnso\DataExport\App\Contracts\ExportsExcel;
+use LaravelEnso\DataExport\App\Models\DataExport;
 
 class ExcelExport
 {
@@ -114,10 +114,7 @@ class ExcelExport
     {
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById($this->chunk, fn($rows) => (
-                $this->addChunk($rows)
-                    ->updateProgress()
-            ));
+            ->chunkById($this->chunk, fn ($rows) => $this->addChunk($rows)->updateProgress());
 
         return $this;
     }
@@ -144,7 +141,7 @@ class ExcelExport
 
     private function exportRows(Collection $rows)
     {
-        return $rows->map(fn($row) => $this->row($this->exporter->mapping($row)))
+        return $rows->map(fn ($row) => $this->row($this->exporter->mapping($row)))
             ->toArray();
     }
 
