@@ -114,10 +114,10 @@ class ExcelExport
     {
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById($this->chunk, function ($rows) {
+            ->chunkById($this->chunk, fn($rows) => (
                 $this->addChunk($rows)
-                    ->updateProgress();
-            });
+                    ->updateProgress()
+            ));
 
         return $this;
     }
@@ -144,9 +144,8 @@ class ExcelExport
 
     private function exportRows(Collection $rows)
     {
-        return $rows->map(function ($row) {
-            return $this->row($this->exporter->mapping($row));
-        })->toArray();
+        return $rows->map(fn($row) => $this->row($this->exporter->mapping($row)))
+            ->toArray();
     }
 
     private function updateProgress()
@@ -187,12 +186,11 @@ class ExcelExport
 
     private function filePath()
     {
-        return $this->filePath
-            ?? $this->filePath = Storage::path(
-                $this->dataExport->folder()
-                    .DIRECTORY_SEPARATOR
-                    .$this->hashName()
-            );
+        return $this->filePath ??= Storage::path(
+            $this->dataExport->folder()
+                .DIRECTORY_SEPARATOR
+                .$this->hashName()
+        );
     }
 
     private function hashName()
