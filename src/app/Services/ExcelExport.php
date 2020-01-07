@@ -114,7 +114,8 @@ class ExcelExport
     {
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById($this->chunk, fn ($rows) => $this->addChunk($rows)->updateProgress());
+            ->chunkById($this->chunk, fn ($rows) => $this->addChunk($rows)
+                ->updateProgress());
 
         return $this;
     }
