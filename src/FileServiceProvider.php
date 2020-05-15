@@ -9,7 +9,7 @@ class FileServiceProvider extends ServiceProvider
 {
     public $register = [
         'exports' => [
-            'model' => DataExport::class,
+            'model' => 'dataExport', //TODO DataExport::morphMapKey()
             'order' => 40,
         ],
     ];

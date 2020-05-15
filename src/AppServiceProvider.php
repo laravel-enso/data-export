@@ -2,6 +2,7 @@
 
 namespace LaravelEnso\DataExport;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use LaravelEnso\DataExport\App\Commands\Purge;
 use LaravelEnso\DataExport\App\Models\DataExport;
@@ -14,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
         DataExport::observe(IOObserver::class);
 
         $this->load()
+            ->mapMorphs()
             ->publish()
             ->commands(Purge::class);
     }
@@ -23,6 +25,15 @@ class AppServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         $this->mergeConfigFrom(__DIR__.'/config/exports.php', 'enso.exports');
+
+        return $this;
+    }
+
+    private function mapMorphs()
+    {
+        Relation::morphMap([
+            DataExport::morphMapKey() => DataExport::class,
+        ]);
 
         return $this;
     }
