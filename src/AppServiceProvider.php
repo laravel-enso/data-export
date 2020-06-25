@@ -2,38 +2,28 @@
 
 namespace LaravelEnso\DataExport;
 
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
-use LaravelEnso\DataExport\App\Commands\Purge;
-use LaravelEnso\DataExport\App\Models\DataExport;
-use LaravelEnso\IO\App\Observers\IOObserver;
+use LaravelEnso\DataExport\Commands\Purge;
+use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\IO\Observers\IOObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        DataExport::observe(IOObserver::class);
-
         $this->load()
-            ->mapMorphs()
             ->publish()
             ->commands(Purge::class);
+
+        DataExport::morphMap();
+        DataExport::observe(IOObserver::class);
     }
 
     private function load()
     {
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        $this->mergeConfigFrom(__DIR__.'/config/exports.php', 'enso.exports');
-
-        return $this;
-    }
-
-    private function mapMorphs()
-    {
-        Relation::morphMap([
-            DataExport::morphMapKey() => DataExport::class,
-        ]);
+        $this->mergeConfigFrom(__DIR__.'/../config/exports.php', 'enso.exports');
 
         return $this;
     }
@@ -41,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     private function publish()
     {
         $this->publishes([
-            __DIR__.'/config' => config_path('enso'),
+            __DIR__.'/../config' => config_path('enso'),
         ], ['data-export-config', 'enso-config']);
 
         return $this;

@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelEnso\DataExport\App\Services;
+namespace LaravelEnso\DataExport\Services;
 
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaravelEnso\Core\App\Models\User;
-use LaravelEnso\DataExport\App\Contracts\AfterExportHook;
-use LaravelEnso\DataExport\App\Contracts\BeforeExportHook;
-use LaravelEnso\DataExport\App\Contracts\ExportsExcel;
-use LaravelEnso\DataExport\App\Models\DataExport;
+use LaravelEnso\Core\Models\User;
+use LaravelEnso\DataExport\Contracts\AfterExportHook;
+use LaravelEnso\DataExport\Contracts\BeforeExportHook;
+use LaravelEnso\DataExport\Contracts\ExportsExcel;
+use LaravelEnso\DataExport\Models\DataExport;
 
 class ExcelExport
 {
@@ -158,7 +158,9 @@ class ExcelExport
         $this->writer->close();
 
         $this->dataExport->attach(
-            new File($this->filePath()), $this->exporter->filename(), $this->user
+            new File($this->filePath()),
+            $this->exporter->filename(),
+            $this->user
         );
 
         $this->dataExport->file->created_by = $this->dataExport->created_by;

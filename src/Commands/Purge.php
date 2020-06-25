@@ -1,11 +1,11 @@
 <?php
 
-namespace LaravelEnso\DataExport\App\Commands;
+namespace LaravelEnso\DataExport\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
-use LaravelEnso\DataExport\App\Models\DataExport;
+use LaravelEnso\DataExport\Models\DataExport;
 
 class Purge extends Command
 {

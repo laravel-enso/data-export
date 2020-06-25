@@ -2,15 +2,18 @@
 
 namespace LaravelEnso\DataExport;
 
-use LaravelEnso\DataExport\App\Models\DataExport;
+use LaravelEnso\DataExport\Models\DataExport;
 use LaravelEnso\Files\FileServiceProvider as ServiceProvider;
 
 class FileServiceProvider extends ServiceProvider
 {
-    public $register = [
-        'exports' => [
-            'model' => 'dataExport', //TODO DataExport::morphMapKey()
+    public function boot()
+    {
+        $this->register['exports'] = [
+            'model' => DataExport::morphMapKey(),
             'order' => 40,
-        ],
-    ];
+        ];
+
+        parent::boot();
+    }
 }

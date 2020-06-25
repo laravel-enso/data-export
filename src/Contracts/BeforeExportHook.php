@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelEnso\DataExport\App\Contracts;
+namespace LaravelEnso\DataExport\Contracts;
 
 interface BeforeExportHook
 {
