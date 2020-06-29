@@ -17,7 +17,7 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
 {
     use CascadesMorphMap, CreatedBy, HasIOStatuses, HasFile, FilePolicies;
 
-    protected $fillable = ['id'];
+    protected $guarded = ['id'];
 
     protected $folder = 'exports';
 
