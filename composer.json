@@ -21,7 +21,7 @@
         "laravel-enso/files": "^4.0",
         "laravel-enso/io": "^2.0",
         "laravel-enso/track-who": "^2.0",
-        "laravel-enso/helpers": "^2.0|^3.0"
+        "laravel-enso/helpers": "^2.0"
     },
     "autoload": {
         "psr-4": {
