@@ -17,7 +17,7 @@
     }],
     "require": {
         "box/spout": "^3.0",
-        "laravel-enso/core": "^5.0",
+        "laravel-enso/core": "^5.0|^6.0",
         "laravel-enso/files": "^4.0",
         "laravel-enso/io": "^2.0",
         "laravel-enso/track-who": "^2.0",
