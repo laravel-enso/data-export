@@ -158,7 +158,7 @@ class ExcelExport
         $this->writer->close();
 
         $this->dataExport->attach(
-            new File($this->filePath()),
+            $this->filePath(),
             $this->exporter->filename(),
             $this->user
         );
