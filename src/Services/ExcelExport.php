@@ -5,7 +5,6 @@ namespace LaravelEnso\DataExport\Services;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\Core\Models\User;
@@ -158,7 +157,7 @@ class ExcelExport
         $this->writer->close();
 
         $this->dataExport->attach(
-            new File($this->filePath()),
+            $this->filePath(),
             $this->exporter->filename(),
             $this->user
         );
