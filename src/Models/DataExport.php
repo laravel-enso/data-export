@@ -5,6 +5,8 @@ namespace LaravelEnso\DataExport\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Config;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Exceptions\Exception;
 use LaravelEnso\Files\Contracts\Attachable;
@@ -75,5 +77,13 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
     public function createdAt(): Carbon
     {
         return $this->created_at;
+    }
+
+    public function scopeExpired(Builder $query): Builder
+    {
+        $retainFor = Config::get('enso.exports.retainFor');
+        $expired = Carbon::today()->subDays($retainFor);
+
+        return $query->where('created_at', '<', $expired);
     }
 }

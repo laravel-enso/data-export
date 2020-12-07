@@ -13,10 +13,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->load()
             ->publish()
-            ->commands(Purge::class);
-
-        DataExport::morphMap();
-        DataExport::observe(IOObserver::class);
+            ->command()
+            ->morphMap()
+            ->observe();
     }
 
     private function load()
@@ -37,5 +36,27 @@ class AppServiceProvider extends ServiceProvider
         ], ['data-export-config', 'enso-config']);
 
         return $this;
+    }
+
+    private function command(): self
+    {
+        $this->commands(Purge::class);
+
+        $this->app->booted(fn () => $this->app->make(Schedule::class)
+            ->command('enso:data-export:purge')->daily());
+
+        return $this;
+    }
+
+    private function morphMap(): self
+    {
+        DataExport::morphMap();
+
+        return $this;
+    }
+
+    private function observe(): void
+    {
+        DataExport::observe(IOObserver::class);
     }
 }
