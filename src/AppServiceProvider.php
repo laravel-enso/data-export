@@ -2,6 +2,7 @@
 
 namespace LaravelEnso\DataExport;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use LaravelEnso\DataExport\Commands\Purge;
 use LaravelEnso\DataExport\Models\DataExport;
