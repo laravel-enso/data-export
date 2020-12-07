@@ -4,33 +4,32 @@ namespace LaravelEnso\DataExport\Services;
 
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use Box\Spout\Writer\XLSX\Writer;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaravelEnso\Core\Models\User;
 use LaravelEnso\DataExport\Contracts\AfterExportHook;
 use LaravelEnso\DataExport\Contracts\BeforeExportHook;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
+use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
 
 class ExcelExport
 {
     private const Extension = 'xlsx';
 
-    private $user;
-    private $dataExport;
-    private $exporter;
-    private $filePath;
-    private $rowLimit;
-    private $chunk;
-    private $writer;
-    private $count;
-    private $sheetCount;
+    private DataExport $export;
+    private ExportsExcel $exporter;
+    private string $path;
+    private int $rowLimit;
+    private int $chunk;
+    private Writer $writer;
+    private int $count;
+    private int $sheetCount;
 
-    public function __construct(User $user, DataExport $dataExport, ExportsExcel $exporter)
+    public function __construct(DataExport $export, ExportsExcel $exporter)
     {
-        $this->user = $user;
-        $this->dataExport = $dataExport;
+        $this->export = $export;
         $this->exporter = $exporter;
         $this->count = 0;
         $this->sheetCount = 1;
@@ -88,14 +87,14 @@ class ExcelExport
             ->build();
 
         $this->writer->setDefaultRowStyle($defaultStyle)
-            ->openToFile($this->filePath());
+            ->openToFile($this->path());
 
         return $this;
     }
 
     private function start()
     {
-        $this->dataExport->startProcessing();
+        $this->export->update(['status' => Statuses::Processing]);
 
         return $this;
     }
@@ -147,24 +146,20 @@ class ExcelExport
 
     private function updateProgress()
     {
-        $this->dataExport->update([
-            'entries' => $this->count,
-        ]);
+        $this->export->update(['entries' => $this->count]);
     }
 
     private function finalize()
     {
         $this->writer->close();
 
-        $this->dataExport->attach(
-            $this->filePath(),
-            $this->exporter->filename(),
-            $this->user
-        );
+        $filename = $this->exporter->filename();
+        $this->export->attach($this->path(), $filename);
 
-        $this->dataExport->file->created_by = $this->dataExport->created_by;
-        $this->dataExport->file->save();
-        $this->dataExport->endOperation();
+        $this->export->file->created_by = $this->export->created_by;
+        $this->export->file->save();
+
+        $this->export->update(['status' => Statuses::Finalized]);
 
         return $this;
     }
@@ -183,10 +178,10 @@ class ExcelExport
         return $this->count > $this->sheetCount * $this->rowLimit;
     }
 
-    private function filePath()
+    private function path()
     {
-        return $this->filePath ??= Storage::path(
-            $this->dataExport->folder()
+        return $this->path ??= Storage::path(
+            $this->export->folder()
                 .DIRECTORY_SEPARATOR
                 .$this->hashName()
         );

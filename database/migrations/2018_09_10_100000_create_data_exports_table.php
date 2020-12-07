@@ -12,12 +12,13 @@ class CreateDataExportsTable extends Migration
             $table->increments('id');
 
             $table->string('name');
+
             $table->integer('entries')->nullable();
+            $table->integer('total');
             $table->integer('status')->nullable();
 
             $table->integer('created_by')->unsigned()->nullable();
-            $table->foreign('created_by')->references('id')
-                ->on('users');
+            $table->foreign('created_by')->references('id')->on('users');
 
             $table->timestamps();
         });

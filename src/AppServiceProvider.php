@@ -23,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
         $this->mergeConfigFrom(__DIR__.'/../config/exports.php', 'enso.exports');
 
         return $this;

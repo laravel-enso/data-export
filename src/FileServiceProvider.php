@@ -7,13 +7,11 @@ use LaravelEnso\Files\FileServiceProvider as ServiceProvider;
 
 class FileServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function folders(): array
     {
-        $this->register['exports'] = [
+        return ['exports' => [
             'model' => DataExport::morphMapKey(),
             'order' => 40,
-        ];
-
-        parent::boot();
+        ]];
     }
 }
