@@ -16,7 +16,7 @@ class DataExportFactory extends Factory
             'name' => $this->faker->name(),
             'entries' => 0,
             'total' => 0,
-            'status' => Statuses::values()->random(),
+            'status' => Statuses::Waiting,
         ];
     }
 }

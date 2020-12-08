@@ -2,10 +2,12 @@
 
 namespace LaravelEnso\DataExport\Services;
 
+use Box\Spout\Common\Entity\Row;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Box\Spout\Writer\XLSX\Writer;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterExportHook;
@@ -21,39 +23,14 @@ class ExcelExport
     private DataExport $export;
     private ExportsExcel $exporter;
     private string $path;
-    private int $rowLimit;
-    private int $chunk;
     private Writer $writer;
-    private int $count;
-    private int $sheetCount;
+    private int $currentChunk;
 
     public function __construct(DataExport $export, ExportsExcel $exporter)
     {
         $this->export = $export;
         $this->exporter = $exporter;
-        $this->count = 0;
-        $this->sheetCount = 1;
-        $this->rowLimit = config('enso.exports.rowLimit');
-        $this->chunk = config('enso.exports.chunk');
-    }
-
-    public function count()
-    {
-        return $this->count;
-    }
-
-    public function rowLimit(int $limit)
-    {
-        $this->rowLimit = $limit;
-
-        return $this;
-    }
-
-    public function chunk(int $chunk)
-    {
-        $this->chunk = $chunk;
-
-        return $this;
+        $this->path = $this->path();
     }
 
     public function handle()
@@ -69,7 +46,7 @@ class ExcelExport
         return $this;
     }
 
-    private function before()
+    private function before(): self
     {
         if ($this->exporter instanceof BeforeExportHook) {
             $this->exporter->before();
@@ -78,7 +55,7 @@ class ExcelExport
         return $this;
     }
 
-    private function initWriter()
+    private function initWriter(): self
     {
         $this->writer = WriterEntityFactory::createXLSXWriter();
 
@@ -87,112 +64,103 @@ class ExcelExport
             ->build();
 
         $this->writer->setDefaultRowStyle($defaultStyle)
-            ->openToFile($this->path());
+            ->openToFile(Storage::path($this->path));
 
         return $this;
     }
 
-    private function start()
+    private function start(): self
     {
         $this->export->update(['status' => Statuses::Processing]);
 
         return $this;
     }
 
-    private function addHeading()
+    private function addHeading(): self
     {
         $this->writer->addRow(
             $this->row($this->exporter->heading())
         );
 
+        $this->currentChunk = 0;
+
         return $this;
     }
 
-    private function addRows()
+    private function addRows(): self
     {
+        $chunk = Config::get('enso.exports.chunk');
+
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById($this->chunk, fn ($rows) => $this->addChunk($rows)
+            ->chunkById($chunk, fn ($rows) => $this->addChunk($rows)
                 ->updateProgress());
 
         return $this;
     }
 
-    private function addChunk(Collection $rows)
+    private function addChunk(Collection $rows): self
     {
-        $this->count += $rows->count();
-
-        if ($this->needsNewSheet()) {
-            $this->addSheet();
-        }
-
-        $this->writer->addRows($this->exportRows($rows));
+        $rows->each(fn ($row) => $this->addRow($row));
 
         return $this;
     }
 
-    private function addSheet()
+    private function addRow($row)
+    {
+        if ($this->needsNewSheet()) {
+            $this->addSheet();
+        }
+
+        $this->writer->addRow($this->row($this->exporter->mapping($row)));
+        $this->currentChunk++;
+    }
+
+    private function addSheet(): void
     {
         $this->writer->addNewSheetAndMakeItCurrent();
         $this->addHeading();
-        $this->sheetCount++;
     }
 
-    private function exportRows(Collection $rows)
+    private function updateProgress(): void
     {
-        return $rows->map(fn ($row) => $this->row($this->exporter->mapping($row)))
-            ->toArray();
+        $this->export->updateProgress($this->currentChunk);
     }
 
-    private function updateProgress()
-    {
-        $this->export->update(['entries' => $this->count]);
-    }
-
-    private function finalize()
+    private function finalize(): self
     {
         $this->writer->close();
 
         $filename = $this->exporter->filename();
-        $this->export->attach($this->path(), $filename);
-
         $this->export->file->created_by = $this->export->created_by;
-        $this->export->file->save();
+        $this->export->attach($this->path, $filename);
 
         $this->export->update(['status' => Statuses::Finalized]);
 
         return $this;
     }
 
-    private function after()
+    private function after(): void
     {
         if ($this->exporter instanceof AfterExportHook) {
             $this->exporter->after();
         }
-
-        return $this;
     }
 
-    private function needsNewSheet()
+    private function needsNewSheet(): bool
     {
-        return $this->count > $this->sheetCount * $this->rowLimit;
+        return $this->currentChunk === (int) Config::get('enso.exports.rowLimit');
     }
 
-    private function path()
+    private function path(): string
     {
-        return $this->path ??= Storage::path(
-            $this->export->folder()
-                .DIRECTORY_SEPARATOR
-                .$this->hashName()
-        );
+        $hash = Str::random(40);
+        $extension = self::Extension;
+
+        return "{$this->export->folder()}/{$hash}.{$extension}";
     }
 
-    private function hashName()
-    {
-        return Str::random(40).'.'.self::Extension;
-    }
-
-    private function row($row)
+    private function row($row): Row
     {
         return WriterEntityFactory::createRowFromArray($row);
     }

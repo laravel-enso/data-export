@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Config;
+use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Exceptions\Exception;
+use LaravelEnso\DataExport\Services\ExcelExport;
 use LaravelEnso\Files\Contracts\Attachable;
 use LaravelEnso\Files\Contracts\AuthorizesFileAccess;
 use LaravelEnso\Files\Traits\FilePolicies;
@@ -77,6 +79,25 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
     public function createdAt(): Carbon
     {
         return $this->created_at;
+    }
+
+    public static function excel(ExportsExcel $exporter): self
+    {
+        $export = self::factory()->create([
+            'name' => $exporter->filename(),
+            'total' => $exporter->query()->total(),
+        ]);
+
+        (new ExcelExport($export, $exporter))->handle();
+
+        return $export;
+    }
+
+    public function updateProgress(int $entries)
+    {
+        $this->entries += $entries;
+        $this->total = max($this->total, $this->entries);
+        $this->save();
     }
 
     public function scopeExpired(Builder $query): Builder
