@@ -85,7 +85,7 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
     {
         $export = self::factory()->create([
             'name' => $exporter->filename(),
-            'total' => $exporter->query()->total(),
+            'total' => $exporter->query()->count(),
         ]);
 
         (new ExcelExport($export, $exporter))->handle();

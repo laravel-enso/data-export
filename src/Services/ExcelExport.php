@@ -133,7 +133,7 @@ class ExcelExport
 
         $filename = $this->exporter->filename();
         $this->export->file->created_by = $this->export->created_by;
-        $this->export->attach($this->path, $filename);
+        $this->export->file->attach($this->path, $filename);
 
         $this->export->update(['status' => Statuses::Finalized]);
 
