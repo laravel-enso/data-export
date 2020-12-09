@@ -17,6 +17,8 @@ use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
 use LaravelEnso\DataExport\Notifications\ExportDone;
+use LaravelEnso\DataExport\Notifications\ExportError;
+use Throwable;
 
 class ExcelExport
 {
@@ -37,6 +39,17 @@ class ExcelExport
 
     public function handle()
     {
+        try {
+            $this->export();
+        } catch (Throwable $th) {
+            $this->failed();
+        }
+
+        return $this;
+    }
+
+    private function export()
+    {
         $this->before()
             ->initWriter()
             ->start()
@@ -45,8 +58,6 @@ class ExcelExport
             ->finalize()
             ->after()
             ->notify();
-
-        return $this;
     }
 
     private function before(): self
@@ -116,7 +127,13 @@ class ExcelExport
         }
 
         $this->writer->addRow($this->row($this->exporter->mapping($row)));
+
         $this->currentChunk++;
+    }
+
+    private function row($row): Row
+    {
+        return WriterEntityFactory::createRowFromArray($row);
     }
 
     private function addSheet(): void
@@ -132,7 +149,7 @@ class ExcelExport
 
     private function finalize(): self
     {
-        $this->writer->close();
+        $this->closeWriter();
 
         $filename = $this->exporter->filename();
         $this->export->file->created_by = $this->export->created_by;
@@ -158,15 +175,18 @@ class ExcelExport
             return;
         }
 
-        $notifiables = method_exists($this->exporter, 'notifiables')
-            ? $this->exporter->notifiables()
-            : $this->export->createdBy;
+        Collection::wrap($this->notifiables())->each->notify(
+            (new ExportDone($this->export, $this->exporter))
+                ->onQueue('notifications')
+        );
+    }
 
-        Collection::wrap($notifiables)
-            ->each(fn ($entity) => $entity->notify(
-                (new ExportDone($this->export, $this->exporter))
-                    ->onQueue('notifications')
-            ));
+    protected function notifyError(): void
+    {
+        Collection::wrap($this->notifiables())->each->notify(
+            (new ExportError($this->export, $this->exporter))
+                ->onQueue('notifications')
+        );
     }
 
     private function needsNewSheet(): bool
@@ -182,8 +202,23 @@ class ExcelExport
         return "{$this->export->folder()}/{$hash}.{$extension}";
     }
 
-    private function row($row): Row
+    private function notifiables(): array
     {
-        return WriterEntityFactory::createRowFromArray($row);
+        return method_exists($this->exporter, 'notifiables')
+            ? $this->exporter->notifiables($this->export)
+            : [$this->export->createdBy];
+    }
+
+    private function failed(): void
+    {
+        $this->export->update(['status' => Statuses::Failed]);
+        Storage::delete($this->path);
+        $this->notifyError();
+        $this->closeWriter();
+    }
+
+    private function closeWriter(): void
+    {
+        $this->writer->close();
     }
 }
