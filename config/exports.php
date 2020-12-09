@@ -14,17 +14,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Chunk
-    |--------------------------------------------------------------------------
-    |
-    | Sets the default chunk when processing excel exports.
-    |
-     */
-
-    'chunk' => env('EXPORT_CHUNK', 25000),
-
-    /*
-    |--------------------------------------------------------------------------
     | Retain exports for a number of days
     |--------------------------------------------------------------------------
     | Sets the default period in days for retaining exports. Must be used
