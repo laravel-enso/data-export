@@ -162,14 +162,9 @@ class ExcelExport
             ? $this->exporter->notifiables()
             : $this->export->createdBy;
 
-        $subject = method_exists($this->exporter, 'notificationSubject')
-            ? $this->exporter->notificationSubject()
-            : null;
-
         Collection::wrap($notifiables)
             ->each(fn ($entity) => $entity->notify(
-                (new ExportDone($this->export, $subject))
-                    ->onQueue('notifications')
+                (new ExportDone($this->export))->onQueue('notifications')
             ));
     }
 

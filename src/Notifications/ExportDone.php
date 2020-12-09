@@ -16,12 +16,10 @@ class ExportDone extends Notification implements ShouldQueue
     use Dispatchable, Queueable;
 
     private DataExport $export;
-    private ?string $subject;
 
-    public function __construct(DataExport $export, ?string $subject)
+    public function __construct(DataExport $export)
     {
         $this->export = $export;
-        $this->subject = $subject ?? __('Your export is done');
     }
 
     public function via()
@@ -33,7 +31,7 @@ class ExportDone extends Notification implements ShouldQueue
     {
         return (new BroadcastMessage($this->toArray() + [
             'level' => 'success',
-            'title' => $this->subject,
+            'title' => $this->export->emailSubject(),
         ]))->onQueue($this->queue);
     }
 
@@ -42,7 +40,7 @@ class ExportDone extends Notification implements ShouldQueue
         $appName = Config::get('app.name');
 
         return (new MailMessage())
-            ->subject("[ {$appName} ] {$this->subject}")
+            ->subject("[ {$appName} ] {$this->export->emailSubject()}")
             ->markdown('laravel-enso/data-export::emails.export', [
                 'name' => $notifiable->person->appellative(),
                 'export' => $this->export,
