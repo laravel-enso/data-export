@@ -8,6 +8,7 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Box\Spout\Writer\XLSX\Writer;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
@@ -45,8 +46,9 @@ class ExcelExport
     {
         try {
             $this->export();
-        } catch (Throwable $th) {
+        } catch (Throwable $throwable) {
             $this->failed();
+            Log::debug($throwable->getMessage());
         }
 
         return $this;
@@ -58,10 +60,15 @@ class ExcelExport
             ->initWriter()
             ->start()
             ->addHeading()
-            ->addRows()
-            ->finalize()
-            ->after()
-            ->notify();
+            ->addRows();
+
+        if ($this->export->fresh()->cancelled()) {
+            $this->closeWriter();
+        } else {
+            $this->finalize()
+                ->after()
+                ->notify();
+        }
     }
 
     private function before(): self
@@ -113,17 +120,18 @@ class ExcelExport
 
         $this->exporter->query()
             ->select($this->exporter->attributes())
-            ->chunkById($chunk, fn ($rows) => $this->addChunk($rows)
-                ->updateProgress());
+            ->chunkById($chunk, fn ($rows) => $this->addChunk($rows));
 
         return $this;
     }
 
-    private function addChunk(Collection $rows): self
+    private function addChunk(Collection $rows): void
     {
-        $rows->each(fn ($row) => $this->addRow($row));
+        if (! $this->export->fresh()->cancelled()) {
+            $rows->each(fn ($row) => $this->addRow($row));
 
-        return $this;
+            $this->updateProgress();
+        }
     }
 
     private function addRow($row)
