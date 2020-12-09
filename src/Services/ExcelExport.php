@@ -18,6 +18,7 @@ use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
 use LaravelEnso\DataExport\Notifications\ExportDone;
 use LaravelEnso\DataExport\Notifications\ExportError;
+use LaravelEnso\Helpers\Services\OptimalChunk;
 use Throwable;
 
 class ExcelExport
@@ -29,12 +30,15 @@ class ExcelExport
     private string $path;
     private Writer $writer;
     private int $currentChunk;
+    private int $currentSheet;
+    private int $rowLimit;
 
     public function __construct(DataExport $export, ExportsExcel $exporter)
     {
         $this->export = $export;
         $this->exporter = $exporter;
         $this->path = $this->path();
+        $this->rowLimit = (int) Config::get('enso.exports.rowLimit');
     }
 
     public function handle()
@@ -96,14 +100,16 @@ class ExcelExport
             $this->row($this->exporter->heading())
         );
 
-        $this->currentChunk = 0;
+        $this->currentSheet = 0;
 
         return $this;
     }
 
     private function addRows(): self
     {
-        $chunk = Config::get('enso.exports.chunk');
+        $chunk = OptimalChunk::get($this->export->total, $this->rowLimit);
+
+        $this->currentChunk = 0;
 
         $this->exporter->query()
             ->select($this->exporter->attributes())
@@ -129,6 +135,7 @@ class ExcelExport
         $this->writer->addRow($this->row($this->exporter->mapping($row)));
 
         $this->currentChunk++;
+        $this->currentSheet++;
     }
 
     private function row($row): Row
@@ -145,6 +152,7 @@ class ExcelExport
     private function updateProgress(): void
     {
         $this->export->updateProgress($this->currentChunk);
+        $this->currentChunk = 0;
     }
 
     private function finalize(): self
@@ -191,7 +199,7 @@ class ExcelExport
 
     private function needsNewSheet(): bool
     {
-        return $this->currentChunk === (int) Config::get('enso.exports.rowLimit');
+        return $this->currentSheet === $this->rowLimit;
     }
 
     private function path(): string
