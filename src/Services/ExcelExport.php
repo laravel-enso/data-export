@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaravelEnso\DataExport\Contracts\AfterExportHook;
-use LaravelEnso\DataExport\Contracts\BeforeExportHook;
+use LaravelEnso\DataExport\Contracts\AfterHook;
+use LaravelEnso\DataExport\Contracts\BeforeHook;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
@@ -51,8 +51,8 @@ class ExcelExport
 
     private function before(): self
     {
-        if ($this->exporter instanceof BeforeExportHook) {
-            $this->exporter->before();
+        if ($this->exporter instanceof BeforeHook) {
+            $this->exporter->before($this->export);
         }
 
         return $this;
@@ -145,8 +145,8 @@ class ExcelExport
 
     private function after(): self
     {
-        if ($this->exporter instanceof AfterExportHook) {
-            $this->exporter->after();
+        if ($this->exporter instanceof AfterHook) {
+            $this->exporter->after($this->export);
         }
 
         return $this;
@@ -164,7 +164,8 @@ class ExcelExport
 
         Collection::wrap($notifiables)
             ->each(fn ($entity) => $entity->notify(
-                (new ExportDone($this->export))->onQueue('notifications')
+                (new ExportDone($this->export, $this->exporter))
+                    ->onQueue('notifications')
             ));
     }
 

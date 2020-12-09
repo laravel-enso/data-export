@@ -9,6 +9,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Config;
+use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Models\DataExport;
 
 class ExportDone extends Notification implements ShouldQueue
@@ -16,10 +17,12 @@ class ExportDone extends Notification implements ShouldQueue
     use Dispatchable, Queueable;
 
     private DataExport $export;
+    private Notifies $exporter;
 
-    public function __construct(DataExport $export)
+    public function __construct(DataExport $export, Notifies $exporter)
     {
         $this->export = $export;
+        $this->exporter = $exporter;
     }
 
     public function via()
@@ -31,7 +34,7 @@ class ExportDone extends Notification implements ShouldQueue
     {
         return (new BroadcastMessage($this->toArray() + [
             'level' => 'success',
-            'title' => $this->export->emailSubject(),
+            'title' => $this->exporter->emailSubject(),
         ]))->onQueue($this->queue);
     }
 
@@ -40,7 +43,7 @@ class ExportDone extends Notification implements ShouldQueue
         $appName = Config::get('app.name');
 
         return (new MailMessage())
-            ->subject("[ {$appName} ] {$this->export->emailSubject()}")
+            ->subject("[ {$appName} ] {$this->exporter->emailSubject()}")
             ->markdown('laravel-enso/data-export::emails.export', [
                 'name' => $notifiable->person->appellative(),
                 'export' => $this->export,
