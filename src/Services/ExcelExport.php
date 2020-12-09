@@ -14,7 +14,6 @@ use LaravelEnso\DataExport\Contracts\AfterExportHook;
 use LaravelEnso\DataExport\Contracts\BeforeExportHook;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
-use LaravelEnso\DataExport\Contracts\NotifiesEntities;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
 use LaravelEnso\DataExport\Notifications\ExportDone;
@@ -159,13 +158,18 @@ class ExcelExport
             return;
         }
 
-        $entities = $this->exporter instanceof NotifiesEntities
-            ? $this->exporter->entities()
+        $notifiables = method_exists($this->exporter, 'notifiables')
+            ? $this->exporter->notifiables()
             : $this->export->createdBy;
 
-        Collection::wrap($entities)->each(fn ($entity) => $entity
-            ->notify(
-                (new ExportDone($this->export))->onQueue('notifications')
+        $subject = method_exists($this->exporter, 'notificationSubject')
+            ? $this->exporter->notificationSubject()
+            : null;
+
+        Collection::wrap($notifiables)
+            ->each(fn ($entity) => $entity->notify(
+                (new ExportDone($this->export, $subject))
+                    ->onQueue('notifications')
             ));
     }
 
