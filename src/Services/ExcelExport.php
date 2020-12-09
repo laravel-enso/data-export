@@ -125,9 +125,11 @@ class ExcelExport
         return $this;
     }
 
-    private function addChunk(Collection $rows): void
+    private function addChunk(Collection $rows)
     {
-        if (! $this->export->fresh()->cancelled()) {
+        if ($this->export->fresh()->cancelled()) {
+            return false;
+        } else {
             $rows->each(fn ($row) => $this->addRow($row));
 
             $this->updateProgress();
