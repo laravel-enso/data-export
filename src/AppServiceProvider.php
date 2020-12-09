@@ -27,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(__DIR__.'/../config/exports.php', 'enso.exports');
 
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-enso/data-export');
+
         return $this;
     }
 
@@ -35,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config' => config_path('enso'),
         ], ['data-export-config', 'enso-config']);
+
+        $this->publishes([
+            __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-enso/data-export'),
+        ], ['data-export-mail', 'enso-mail']);
 
         return $this;
     }

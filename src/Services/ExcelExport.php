@@ -13,8 +13,11 @@ use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterExportHook;
 use LaravelEnso\DataExport\Contracts\BeforeExportHook;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
+use LaravelEnso\DataExport\Contracts\Notifies;
+use LaravelEnso\DataExport\Contracts\NotifiesEntities;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Notifications\ExportDone;
 
 class ExcelExport
 {
@@ -41,7 +44,8 @@ class ExcelExport
             ->addHeading()
             ->addRows()
             ->finalize()
-            ->after();
+            ->after()
+            ->notify();
 
         return $this;
     }
@@ -140,11 +144,29 @@ class ExcelExport
         return $this;
     }
 
-    private function after(): void
+    private function after(): self
     {
         if ($this->exporter instanceof AfterExportHook) {
             $this->exporter->after();
         }
+
+        return $this;
+    }
+
+    private function notify()
+    {
+        if (! $this->exporter instanceof Notifies) {
+            return;
+        }
+
+        $entities = $this->exporter instanceof NotifiesEntities
+            ? $this->exporter->entities()
+            : $this->export->createdBy;
+
+        Collection::wrap($entities)->each(fn ($entity) => $entity
+            ->notify(
+                (new ExportDone($this->export))->onQueue('notifications')
+            ));
     }
 
     private function needsNewSheet(): bool

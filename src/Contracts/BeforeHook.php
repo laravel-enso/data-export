@@ -2,7 +2,7 @@
 
 namespace LaravelEnso\DataExport\Contracts;
 
-interface BeforeExportHook
+interface BeforeHook
 {
     public function before(): void;
 }

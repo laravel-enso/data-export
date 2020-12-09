@@ -2,7 +2,7 @@
 
 namespace LaravelEnso\DataExport\Contracts;
 
-interface AfterExportHook
+interface AfterHook
 {
     public function after(): void;
 }
