@@ -1,7 +1,7 @@
 @component('mail::message')
 {{ __('Hi :name', ['name' => $name]) }},
 
-{{ __('Your :filename file is ready', [
+{{ __('The :filename file is ready', [
     'filename' => $export->file->original_name,
 ]) }}.
 
