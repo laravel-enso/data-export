@@ -47,8 +47,8 @@ class ExcelExport
         try {
             $this->export();
         } catch (Throwable $throwable) {
-            $this->failed();
             Log::debug($throwable->getMessage());
+            $this->failed();
         }
 
         return $this;
