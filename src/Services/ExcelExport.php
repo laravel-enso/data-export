@@ -229,7 +229,7 @@ class ExcelExport
 
     private function emailSubject(): ?string
     {
-        return method_exists($this->export, 'emailSubject')
+        return method_exists($this->exporter, 'emailSubject')
             ? $this->exporter->emailSubject($this->export)
             : null;
     }
