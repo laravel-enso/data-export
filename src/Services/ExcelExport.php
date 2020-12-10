@@ -6,7 +6,7 @@ use Box\Spout\Common\Entity\Row;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Box\Spout\Writer\XLSX\Writer;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -192,21 +192,19 @@ class ExcelExport
         if ($this->exporter instanceof Notifies) {
             $this->exporter->notify($this->export);
         } else {
-            Collection::wrap($this->notifiables())
-                ->each(fn ($notifiable) => $notifiable->notify(
-                    (new ExportDone($this->export, $this->emailSubject()))
-                        ->onQueue('notifications')
-                ));
+            $this->notifiables()->each->notify(
+                (new ExportDone($this->export, $this->emailSubject()))
+                    ->onQueue('notifications')
+            );
         }
     }
 
     protected function notifyError(): void
     {
-        Collection::wrap($this->notifiables())
-            ->each(fn ($notifiable) => $notifiable->notify(
-                (new ExportError($this->export, $this->emailSubject()))
-                    ->onQueue('notifications')
-            ));
+        $this->notifiables()->each->notify(
+            (new ExportError($this->export, $this->emailSubject()))
+                ->onQueue('notifications')
+        );
     }
 
     private function needsNewSheet(): bool
@@ -222,11 +220,11 @@ class ExcelExport
         return "{$this->export->folder()}/{$hash}.{$extension}";
     }
 
-    private function notifiables(): array
+    private function notifiables(): Collection
     {
         return method_exists($this->exporter, 'notifiables')
             ? $this->exporter->notifiables($this->export)
-            : [$this->export->createdBy];
+            : Collection::wrap($this->export->createdBy);
     }
 
     private function emailSubject(): ?string
