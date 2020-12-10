@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
 use LaravelEnso\DataExport\Contracts\BeforeHook;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
+use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
 use LaravelEnso\DataExport\Notifications\ExportDone;
@@ -32,7 +33,6 @@ class ExcelExport
     private int $currentChunk;
     private int $currentSheet;
     private int $rowLimit;
-    private bool $notifies;
 
     public function __construct(DataExport $export, ExportsExcel $exporter)
     {
@@ -40,7 +40,6 @@ class ExcelExport
         $this->exporter = $exporter;
         $this->path = $this->path();
         $this->rowLimit = (int) Config::get('enso.exports.rowLimit');
-        $this->notifies = true;
     }
 
     public function handle()
@@ -51,13 +50,6 @@ class ExcelExport
             $this->failed();
             Log::debug($throwable->getMessage());
         }
-
-        return $this;
-    }
-
-    public function skipNotification(): self
-    {
-        $this->notifies = false;
 
         return $this;
     }
@@ -195,9 +187,11 @@ class ExcelExport
         return $this;
     }
 
-    private function notify()
+    private function notify(): void
     {
-        if ($this->notifies) {
+        if ($this->exporter instanceof Notifies) {
+            $this->exporter->notify($this->export);
+        } else {
             Collection::wrap($this->notifiables())->each->notify(
                 (new ExportDone($this->export, $this->emailSubject()))
                     ->onQueue('notifications')
