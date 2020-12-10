@@ -14,7 +14,6 @@ use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
 use LaravelEnso\DataExport\Contracts\BeforeHook;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
-use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Models\DataExport;
 use LaravelEnso\DataExport\Notifications\ExportDone;
@@ -189,12 +188,8 @@ class ExcelExport
 
     private function notify()
     {
-        if (! $this->exporter instanceof Notifies) {
-            return;
-        }
-
         Collection::wrap($this->notifiables())->each->notify(
-            (new ExportDone($this->export, $this->exporter))
+            (new ExportDone($this->export, $this->emailSubject()))
                 ->onQueue('notifications')
         );
     }
@@ -202,7 +197,7 @@ class ExcelExport
     protected function notifyError(): void
     {
         Collection::wrap($this->notifiables())->each->notify(
-            (new ExportError($this->export, $this->exporter))
+            (new ExportError($this->export, $this->emailSubject()))
                 ->onQueue('notifications')
         );
     }
@@ -225,6 +220,13 @@ class ExcelExport
         return method_exists($this->exporter, 'notifiables')
             ? $this->exporter->notifiables($this->export)
             : [$this->export->createdBy];
+    }
+
+    private function emailSubject(): ?string
+    {
+        return method_exists($this->export, 'emailSubject')
+            ? $this->exporter->emailSubject($this->export)
+            : null;
     }
 
     private function failed(): void

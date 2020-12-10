@@ -5,8 +5,9 @@ namespace LaravelEnso\DataExport\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use LaravelEnso\DataExport\Contracts\Notifies;
+use Illuminate\Support\Facades\Config;
 use LaravelEnso\DataExport\Models\DataExport;
 
 class ExportError extends Notification implements ShouldQueue
@@ -14,14 +15,12 @@ class ExportError extends Notification implements ShouldQueue
     use Queueable;
 
     private DataExport $export;
-    private Notifies $exporter;
     private string $subject;
 
-    public function __construct(DataExport $export, Notifies $exporter)
+    public function __construct(DataExport $export, ?string $subject = null)
     {
         $this->export = $export;
-        $this->exporter = $exporter;
-        $this->subject = $exporter->emailSubject($export);
+        $this->subject = $subject ?? __('Export error');
     }
 
     public function via()
@@ -33,23 +32,27 @@ class ExportError extends Notification implements ShouldQueue
     {
         return (new BroadcastMessage($this->toArray() + [
             'level' => 'error',
-            'title' => $this->subject(),
+            'title' => __('Export error'),
         ]))->onQueue($this->queue);
+    }
+
+    public function toMail()
+    {
+        $appName = Config::get('app.name');
+
+        return (new MailMessage())
+            ->subject("[ {$appName} ] {$this->subject}")
+            ->line(__('An error was encountered while generationg :export', [
+                'export' => $this->export->name,
+            ]));
     }
 
     public function toArray()
     {
         return [
-            'body' => $this->subject(),
+            'body' => $this->subject,
             'path' => '#',
             'icon' => 'file-excel',
         ];
-    }
-
-    private function subject(): string
-    {
-        return __('An error was encountered while generationg :export', [
-            'export' => $this->subject,
-        ]);
     }
 }
