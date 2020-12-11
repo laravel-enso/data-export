@@ -245,6 +245,8 @@ class ExcelExport
 
     private function closeWriter(): void
     {
-        $this->writer->close();
+        if (isset($this->writer)) {
+            $this->writer->close();
+        }
     }
 }
