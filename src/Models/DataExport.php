@@ -53,6 +53,11 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
         return in_array($this->status, Statuses::running());
     }
 
+    public function finalized(): bool
+    {
+        return $this->status === Statuses::Finalized;
+    }
+
     public function operationType(): int
     {
         return IOTypes::Export;
