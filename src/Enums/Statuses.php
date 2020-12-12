@@ -20,12 +20,7 @@ class Statuses extends Enum
         self::Failed => 'failed',
     ];
 
-    public static function isCancellable(int $status): bool
-    {
-        return in_array($status, self::cancellable());
-    }
-
-    public static function cancellable(): array
+    public static function running(): array
     {
         return [static::Waiting, static::Processing];
     }

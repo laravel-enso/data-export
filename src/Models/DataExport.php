@@ -31,7 +31,7 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
 
     public function cancel(): void
     {
-        if (! Statuses::isCancellable($this->status)) {
+        if (! $this->running()) {
             throw Exception::cannotBeCancelled();
         }
 
@@ -43,6 +43,16 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
         return $this->status === Statuses::Cancelled;
     }
 
+    public function failed(): bool
+    {
+        return $this->status === Statuses::Failed;
+    }
+
+    public function running(): true
+    {
+        return in_array($this->status, Statuses::running());
+    }
+
     public function operationType(): int
     {
         return IOTypes::Export;
@@ -50,7 +60,7 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
 
     public function status(): int
     {
-        return Statuses::isCancellable($this->status)
+        return $this->running()
             ? $this->status
             : Statuses::Finalized;
     }
