@@ -54,7 +54,7 @@ class ExportDone extends Notification implements ShouldQueue
         return [
             'body' => $this->body(),
             'icon' => 'file-excel',
-            'path' => '/import',
+            'path' => '/files',
         ];
     }
 
