@@ -137,7 +137,8 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
             'total' => 0,
         ]);
 
-        $export->createdBy->notify(new ExportStarted($export->name));
+        $export->createdBy->notify((new ExportStarted($export->name))
+            ->onQueue('notifications'));
 
         $path = Str::afterLast((new SyncExporter($exporter))->save(), 'app/');
 
@@ -148,7 +149,9 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
         $export->file->created_by = $export->created_by;
         $export->file->attach($path ?? 'temp', $exporter->filename());
         $export->update(['status' => Statuses::Finalized]);
-        $export->createdBy->notify(new ExportDone($export));
+
+        $export->createdBy->notify((new ExportDone($export))
+            ->onQueue('notifications'));
 
         return $export;
     }

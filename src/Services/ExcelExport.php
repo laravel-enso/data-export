@@ -193,19 +193,17 @@ class ExcelExport
         if ($this->exporter instanceof Notifies) {
             $this->exporter->notify($this->export);
         } else {
-            $this->notifiables()->each->notify(
-                (new ExportDone($this->export, $this->emailSubject()))
-                    ->onQueue('notifications')
-            );
+            $this->notifiables()
+                ->each->notify((new ExportDone($this->export, $this->emailSubject()))
+                    ->onQueue('notifications'));
         }
     }
 
     protected function notifyError(): void
     {
-        $this->notifiables()->each->notify(
-            (new ExportError($this->export, $this->emailSubject()))
-                ->onQueue('notifications')
-        );
+        $this->notifiables()
+            ->each->notify((new ExportError($this->export, $this->emailSubject()))
+                ->onQueue('notifications'));
     }
 
     private function needsNewSheet(): bool
