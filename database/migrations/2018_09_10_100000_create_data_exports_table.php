@@ -11,7 +11,7 @@ class CreateDataExportsTable extends Migration
         Schema::create('data_exports', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->string('name');
+            $table->string('name')->index();
 
             $table->integer('entries')->nullable();
             $table->integer('total');

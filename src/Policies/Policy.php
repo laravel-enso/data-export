@@ -3,8 +3,8 @@
 namespace LaravelEnso\DataExport\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use LaravelEnso\Core\Models\User;
 use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\Users\Models\User;
 
 class Policy
 {

@@ -14,13 +14,10 @@ class ExportError extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private DataExport $export;
-    private string $subject;
-
-    public function __construct(DataExport $export, ?string $subject = null)
-    {
-        $this->export = $export;
-        $this->subject = $subject ?? __('Export error');
+    public function __construct(
+        private DataExport $export,
+        private string $subject = __('Export error')
+    ) {
     }
 
     public function via()

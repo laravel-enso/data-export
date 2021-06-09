@@ -8,7 +8,6 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Box\Spout\Writer\XLSX\Writer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
@@ -26,20 +25,18 @@ class ExcelExport
 {
     private const Extension = 'xlsx';
 
-    private DataExport $export;
-    private ExportsExcel $exporter;
     private string $path;
+    private int $rowLimit;
     private Writer $writer;
     private int $currentChunk;
     private int $currentSheet;
-    private int $rowLimit;
 
-    public function __construct(DataExport $export, ExportsExcel $exporter)
-    {
-        $this->export = $export;
-        $this->exporter = $exporter;
+    public function __construct(
+        private DataExport $export,
+        private ExportsExcel $exporter
+    ) {
         $this->path = $this->path();
-        $this->rowLimit = (int) Config::get('enso.exports.rowLimit');
+        $this->rowLimit = Config::get('enso.exports.rowLimit');
     }
 
     public function handle()
@@ -47,7 +44,6 @@ class ExcelExport
         try {
             $this->export();
         } catch (Throwable $throwable) {
-            Log::debug($throwable->getMessage());
             $this->failed();
             throw $throwable;
         }

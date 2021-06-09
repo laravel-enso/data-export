@@ -13,7 +13,7 @@ class DataExportFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name(),
+            'name' => null,
             'entries' => 0,
             'total' => 0,
             'status' => Statuses::Waiting,

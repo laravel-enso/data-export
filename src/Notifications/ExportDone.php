@@ -15,13 +15,10 @@ class ExportDone extends Notification implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
-    private DataExport $export;
-    private string $subject;
-
-    public function __construct(DataExport $export, ?string $subject = null)
-    {
-        $this->export = $export;
-        $this->subject = $subject ?? __('Export done');
+    public function __construct(
+        private DataExport $export,
+        private string $subject = __('Export done')
+    ) {
     }
 
     public function via()
