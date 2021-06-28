@@ -16,8 +16,9 @@ class ExportError extends Notification implements ShouldQueue
 
     public function __construct(
         private DataExport $export,
-        private string $subject = __('Export error')
+        private string $subject
     ) {
+        $this->subject ??= __('Export error');
     }
 
     public function via()
