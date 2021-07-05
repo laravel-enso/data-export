@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
 use LaravelEnso\DataExport\Contracts\BeforeHook;
+use LaravelEnso\DataExport\Contracts\CustomRowAction;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
@@ -139,7 +140,11 @@ class ExcelExport
             $this->addSheet();
         }
 
-        $this->writer->addRow($this->row($this->exporter->mapping($row)));
+        if ($this->exporter instanceof CustomRowAction) {
+            $this->exporter->customRowAction($this->writer, $row);
+        } else {
+            $this->writer->addRow($this->row($this->exporter->mapping($row)));
+        }
 
         $this->currentChunk++;
         $this->currentSheet++;
