@@ -2,9 +2,9 @@
 
 namespace LaravelEnso\DataExport\Contracts;
 
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 
 interface AfterHook
 {
-    public function after(DataExport $export): void;
+    public function after(Export $export): void;
 }

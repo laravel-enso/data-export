@@ -16,9 +16,11 @@ use LaravelEnso\DataExport\Contracts\CustomRowAction;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 use LaravelEnso\DataExport\Notifications\ExportDone;
 use LaravelEnso\DataExport\Notifications\ExportError;
+use LaravelEnso\Files\Models\File;
+use LaravelEnso\Files\Models\Type;
 use LaravelEnso\Helpers\Services\OptimalChunk;
 use Throwable;
 
@@ -33,7 +35,7 @@ class ExcelExport
     private int $currentSheet;
 
     public function __construct(
-        private DataExport $export,
+        private Export $export,
         private ExportsExcel $exporter
     ) {
         $this->path = $this->path();
@@ -172,10 +174,13 @@ class ExcelExport
         $this->closeWriter();
 
         $filename = $this->exporter->filename();
-        $this->export->file->created_by = $this->export->created_by;
-        $this->export->file->attach($this->path, $filename);
+        $args = [$this->export, $this->path, $filename, $this->export->created_by];
 
-        $this->export->update(['status' => Statuses::Finalized]);
+        $file = File::attach(...$args);
+
+        $this->export->fill(['status' => Statuses::Finalized])
+            ->file()->associate($file)
+            ->save();
 
         return $this;
     }
@@ -216,8 +221,9 @@ class ExcelExport
     {
         $hash = Str::random(40);
         $extension = self::Extension;
+        $folder = Type::for($this->export)->folder;
 
-        return "{$this->export->folder()}/{$hash}.{$extension}";
+        return "{$folder}/{$hash}.{$extension}";
     }
 
     private function notifiables(): Collection

@@ -2,9 +2,9 @@
 
 namespace LaravelEnso\DataExport\Contracts;
 
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 
 interface Notifies
 {
-    public function notify(DataExport $export): void;
+    public function notify(Export $export): void;
 }

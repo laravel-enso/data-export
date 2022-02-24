@@ -2,9 +2,9 @@
 
 namespace LaravelEnso\DataExport\Contracts;
 
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 
 interface BeforeHook
 {
-    public function before(DataExport $export): void;
+    public function before(Export $export): void;
 }

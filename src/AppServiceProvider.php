@@ -5,7 +5,7 @@ namespace LaravelEnso\DataExport;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use LaravelEnso\DataExport\Commands\Purge;
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 use LaravelEnso\IO\Observers\IOObserver;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,7 +15,6 @@ class AppServiceProvider extends ServiceProvider
         $this->load()
             ->publish()
             ->command()
-            ->morphMap()
             ->observe();
     }
 
@@ -55,15 +54,8 @@ class AppServiceProvider extends ServiceProvider
         return $this;
     }
 
-    private function morphMap(): self
-    {
-        DataExport::morphMap();
-
-        return $this;
-    }
-
     private function observe(): void
     {
-        DataExport::observe(IOObserver::class);
+        Export::observe(IOObserver::class);
     }
 }

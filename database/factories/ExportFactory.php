@@ -4,11 +4,11 @@ namespace LaravelEnso\DataExport\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LaravelEnso\DataExport\Enums\Statuses;
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 
-class DataExportFactory extends Factory
+class ExportFactory extends Factory
 {
-    protected $model = DataExport::class;
+    protected $model = Export::class;
 
     public function definition()
     {

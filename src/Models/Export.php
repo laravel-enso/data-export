@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
@@ -17,24 +18,26 @@ use LaravelEnso\DataExport\Services\ExcelExport as AsyncExporter;
 use LaravelEnso\Excel\Contracts\ExportsExcel as SyncExcel;
 use LaravelEnso\Excel\Services\ExcelExport as SyncExporter;
 use LaravelEnso\Files\Contracts\Attachable;
-use LaravelEnso\Files\Contracts\AuthorizesFileAccess;
-use LaravelEnso\Files\Traits\FilePolicies;
-use LaravelEnso\Files\Traits\HasFile;
+use LaravelEnso\Files\Models\File;
 use LaravelEnso\Helpers\Services\Decimals;
-use LaravelEnso\Helpers\Traits\CascadesMorphMap;
 use LaravelEnso\IO\Contracts\IOOperation;
 use LaravelEnso\IO\Enums\IOTypes;
 use LaravelEnso\Tables\Notifications\ExportStarted;
 use LaravelEnso\TrackWho\Traits\CreatedBy;
 use UnexpectedValueException;
 
-class DataExport extends Model implements Attachable, IOOperation, AuthorizesFileAccess
+class Export extends Model implements Attachable, IOOperation
 {
-    use CascadesMorphMap, CreatedBy, HasFile, HasFactory, FilePolicies;
+    use CreatedBy, HasFactory;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
-    protected $folder = 'exports';
+    protected $table = 'data_exports';
+
+    public function file(): Relation
+    {
+        return $this->belongsTo(File::class);
+    }
 
     public function cancel(): void
     {
@@ -92,7 +95,6 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
     {
         return [
             'name' => $this->name,
-            'filename' => $this->file->original_name,
             'entries' => $this->entries,
             'total' => $this->total,
         ];
@@ -140,15 +142,18 @@ class DataExport extends Model implements Attachable, IOOperation, AuthorizesFil
         $export->createdBy->notify((new ExportStarted($export->name))
             ->onQueue('notifications'));
 
-        $path = Str::afterLast((new SyncExporter($exporter))->save(), 'app/');
-
         $count = Collection::wrap($exporter->sheets())
             ->reduce(fn ($total, $sheet) => $total += count($exporter->rows($sheet)), 0);
 
         $export->updateProgress($count);
-        $export->file->created_by = $export->created_by;
-        $export->file->attach($path ?? 'temp', $exporter->filename());
-        $export->update(['status' => Statuses::Finalized]);
+
+        $path = Str::afterLast((new SyncExporter($exporter))->save(), 'app/');
+        $args = [$export, $path, $exporter->filename(), $export->created_by];
+        $file = File::attach(...$args);
+
+        $export->fill(['status' => Statuses::Finalized])
+            ->file()->associate($file)
+            ->save();
 
         $export->createdBy->notify((new ExportDone($export))
             ->onQueue('notifications'));

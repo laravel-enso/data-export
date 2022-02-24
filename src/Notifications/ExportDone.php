@@ -9,16 +9,16 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Config;
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 
 class ExportDone extends Notification implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
-    private DataExport $export;
+    private Export $export;
     private string $subject;
 
-    public function __construct(DataExport $export, ?string $subject = null)
+    public function __construct(Export $export, ?string $subject = null)
     {
         $this->export = $export;
         $this->subject = $subject ? __($subject) : __('Export done');

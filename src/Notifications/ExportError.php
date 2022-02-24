@@ -8,14 +8,14 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Config;
-use LaravelEnso\DataExport\Models\DataExport;
+use LaravelEnso\DataExport\Models\Export;
 
 class ExportError extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
-        private DataExport $export,
+        private Export $export,
         private string $subject
     ) {
         $this->subject ??= __('Export error');

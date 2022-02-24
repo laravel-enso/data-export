@@ -37,8 +37,7 @@
             "providers": [
                 "LaravelEnso\\DataExport\\AppServiceProvider",
                 "LaravelEnso\\DataExport\\AuthServiceProvider",
-                "LaravelEnso\\DataExport\\EnumServiceProvider",
-                "LaravelEnso\\DataExport\\FileServiceProvider"
+                "LaravelEnso\\DataExport\\EnumServiceProvider"
             ]
         }
     }
