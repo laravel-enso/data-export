@@ -221,9 +221,8 @@ class ExcelExport
     {
         $hash = Str::random(40);
         $extension = self::Extension;
-        $folder = Type::for($this->export)->folder;
 
-        return "{$folder}/{$hash}.{$extension}";
+        return Type::for($this->export)->path("{$hash}.{$extension}");
     }
 
     private function notifiables(): Collection
