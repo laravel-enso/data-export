@@ -28,7 +28,7 @@ class ExcelExport
 {
     private const Extension = 'xlsx';
 
-    private string $path;
+    private string $filename;
     private int $rowLimit;
     private Writer $writer;
     private int $currentChunk;
@@ -38,7 +38,7 @@ class ExcelExport
         private Export $export,
         private ExportsExcel $exporter
     ) {
-        $this->path = $this->path();
+        $this->filename = $this->filename();
         $this->rowLimit = Config::get('enso.exports.rowLimit');
     }
 
@@ -89,7 +89,7 @@ class ExcelExport
             ->build();
 
         $this->writer->setDefaultRowStyle($defaultStyle)
-            ->openToFile(Storage::path($this->path));
+            ->openToFile(Storage::path($this->path()));
 
         return $this;
     }
@@ -174,7 +174,7 @@ class ExcelExport
         $this->closeWriter();
 
         $filename = $this->exporter->filename();
-        $args = [$this->export, $this->path, $filename, $this->export->created_by];
+        $args = [$this->export, $this->filename, $filename, $this->export->created_by];
 
         $file = File::attach(...$args);
 
@@ -217,12 +217,17 @@ class ExcelExport
         return $this->currentSheet === $this->rowLimit;
     }
 
-    private function path(): string
+    private function filename(): string
     {
         $hash = Str::random(40);
         $extension = self::Extension;
 
-        return Type::for($this->export)->path("{$hash}.{$extension}");
+        return "{$hash}.{$extension}";
+    }
+
+    private function path(): string
+    {
+        return Type::for($this->export::class)->path($this->filename);
     }
 
     private function notifiables(): Collection
@@ -242,7 +247,7 @@ class ExcelExport
     private function failed(): void
     {
         $this->export->update(['status' => Statuses::Failed]);
-        Storage::delete($this->path);
+        Storage::delete($this->path());
         $this->notifyError();
         $this->closeWriter();
     }
