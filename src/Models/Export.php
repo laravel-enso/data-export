@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\ExportsExcel as AsyncExcel;
 use LaravelEnso\DataExport\Enums\Statuses;
@@ -19,6 +20,7 @@ use LaravelEnso\Excel\Contracts\ExportsExcel as SyncExcel;
 use LaravelEnso\Excel\Services\ExcelExport as SyncExporter;
 use LaravelEnso\Files\Contracts\Attachable;
 use LaravelEnso\Files\Models\File;
+use LaravelEnso\Files\Models\Type;
 use LaravelEnso\Helpers\Services\Decimals;
 use LaravelEnso\IO\Contracts\IOOperation;
 use LaravelEnso\IO\Enums\IOTypes;
@@ -147,8 +149,12 @@ class Export extends Model implements Attachable, IOOperation
 
         $export->updateProgress($count);
 
-        $path = Str::afterLast((new SyncExporter($exporter))->save(), 'app/');
-        $args = [$export, $path, $exporter->filename(), $export->created_by];
+        $location = Str::afterLast((new SyncExporter($exporter))->save(), 'app/');
+        $filename = Str::afterLast($location, '/');
+
+        Storage::move($location, Type::for(self::class)->path($filename));
+
+        $args = [$export, $filename, $exporter->filename(), $export->created_by];
         $file = File::attach(...$args);
 
         $export->fill(['status' => Statuses::Finalized])

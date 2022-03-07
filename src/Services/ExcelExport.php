@@ -28,7 +28,7 @@ class ExcelExport
 {
     private const Extension = 'xlsx';
 
-    private string $filename;
+    private string $savedName;
     private int $rowLimit;
     private Writer $writer;
     private int $currentChunk;
@@ -38,7 +38,7 @@ class ExcelExport
         private Export $export,
         private ExportsExcel $exporter
     ) {
-        $this->filename = $this->filename();
+        $this->savedName = $this->savedName();
         $this->rowLimit = Config::get('enso.exports.rowLimit');
     }
 
@@ -173,8 +173,10 @@ class ExcelExport
     {
         $this->closeWriter();
 
-        $filename = $this->exporter->filename();
-        $args = [$this->export, $this->filename, $filename, $this->export->created_by];
+        $args = [
+            $this->export, $this->savedName,
+            $this->exporter->filename(), $this->export->created_by,
+        ];
 
         $file = File::attach(...$args);
 
@@ -217,7 +219,7 @@ class ExcelExport
         return $this->currentSheet === $this->rowLimit;
     }
 
-    private function filename(): string
+    private function savedName(): string
     {
         $hash = Str::random(40);
         $extension = self::Extension;
@@ -227,7 +229,7 @@ class ExcelExport
 
     private function path(): string
     {
-        return Type::for($this->export::class)->path($this->filename);
+        return Type::for($this->export::class)->path($this->savedName);
     }
 
     private function notifiables(): Collection
