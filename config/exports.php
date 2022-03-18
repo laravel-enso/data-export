@@ -16,10 +16,10 @@ return [
     |--------------------------------------------------------------------------
     | Retain exports for a number of days
     |--------------------------------------------------------------------------
-    | Sets the default period in days for retaining exports. Must be used
-    | together with the Purge command.
+    | The default period in days for retaining exports. Is used by the
+    | Purge command.
     |
      */
 
-    'retainFor' => env('EXPORT_RETAIN_FOR', 60),
+    'retainFor' => (int) env('EXPORT_RETAIN_FOR', 60),
 ];
