@@ -114,13 +114,27 @@ class ExcelExport
 
     private function addRows(): self
     {
-        $chunk = OptimalChunk::get($this->export->total, $this->rowLimit);
+        $query = $this->exporter->query()
+            ->select($this->exporter->attributes());
 
+        $optimalChunk = OptimalChunk::get($this->export->total, $this->rowLimit);
         $this->currentChunk = 0;
+        $primaryKey = $query->getModel()->getKeyName();
+        $max = $query->max($primaryKey);
+        $from = 0;
 
-        $this->exporter->query()
-            ->select($this->exporter->attributes())
-            ->chunkById($chunk, fn ($rows) => $this->addChunk($rows));
+        while ($from <= $max) {
+            $to = $from + $optimalChunk;
+
+            $chunk = $query->clone()
+                ->where($primaryKey, '>', $from)
+                ->where($primaryKey, '<=', $to)
+                ->get();
+
+            $this->addChunk($chunk);
+
+            $from = $to;
+        }
 
         return $this;
     }
