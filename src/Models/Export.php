@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use LaravelEnso\DataExport\Contracts\CustomCount;
 use LaravelEnso\DataExport\Contracts\ExportsExcel as AsyncExcel;
 use LaravelEnso\DataExport\Enums\Statuses;
 use LaravelEnso\DataExport\Exceptions\Exception;
@@ -125,7 +126,9 @@ class Export extends Model implements Attachable, IOOperation
     {
         $export = self::factory()->create([
             'name' => $exporter->filename(),
-            'total' => $exporter->query()->count(),
+            'total' => $exporter instanceof CustomCount
+                ? $exporter->count()
+                : $exporter->query()->count(),
         ]);
 
         (new AsyncExporter($export, $exporter))->handle();
