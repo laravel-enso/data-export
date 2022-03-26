@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
 use LaravelEnso\DataExport\Contracts\BeforeHook;
+use LaravelEnso\DataExport\Contracts\CustomMax;
 use LaravelEnso\DataExport\Contracts\CustomRowAction;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
@@ -120,7 +121,11 @@ class ExcelExport
         $optimalChunk = OptimalChunk::get($this->export->total, $this->rowLimit);
         $this->currentChunk = 0;
         $primaryKey = $query->getModel()->getKeyName();
-        $max = $query->max($primaryKey);
+
+        $max = $this->exporter instanceof CustomMax
+            ? $this->exporter->max()
+            : $query->max($primaryKey);
+
         $from = 0;
 
         while ($from <= $max) {
