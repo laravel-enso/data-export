@@ -125,7 +125,7 @@ class ExcelExport
         $max = $this->exporter instanceof CustomMax
             ? $this->exporter->max()
             : $query->max($primaryKey);
-
+        \Log::info($max);
         $from = 0;
 
         while ($from <= $max) {
@@ -220,16 +220,17 @@ class ExcelExport
         if ($this->exporter instanceof Notifies) {
             $this->exporter->notify($this->export);
         } else {
-            $this->notifiables()
-                ->each->notify((new ExportDone($this->export, $this->emailSubject()))
-                    ->onQueue('notifications'));
+            $notification = new ExportDone($this->export, $this->emailSubject());
+
+            $this->notifiables()->each
+                ->notify($notification->onQueue('notifications'));
         }
     }
 
     protected function notifyError(): void
     {
         $this->notifiables()
-            ->each->notify((new ExportError($this->export, $this->emailSubject()))
+            ->each->notify((new ExportError($this->export))
                 ->onQueue('notifications'));
     }
 
@@ -258,11 +259,11 @@ class ExcelExport
             : Collection::wrap($this->export->createdBy);
     }
 
-    private function emailSubject(): ?string
+    private function emailSubject(): string
     {
         return method_exists($this->exporter, 'emailSubject')
             ? $this->exporter->emailSubject($this->export)
-            : null;
+            : __(':name export done', ['name' => $this->export->name]);
     }
 
     private function failed(): void
