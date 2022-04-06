@@ -20,6 +20,7 @@ use LaravelEnso\DataExport\Services\ExcelExport as AsyncExporter;
 use LaravelEnso\Excel\Contracts\ExportsExcel as SyncExcel;
 use LaravelEnso\Excel\Services\ExcelExport as SyncExporter;
 use LaravelEnso\Files\Contracts\Attachable;
+use LaravelEnso\Files\Contracts\CascadesFileDeletion;
 use LaravelEnso\Files\Models\File;
 use LaravelEnso\Files\Models\Type;
 use LaravelEnso\Helpers\Services\Decimals;
@@ -29,7 +30,10 @@ use LaravelEnso\Tables\Notifications\ExportStarted;
 use LaravelEnso\TrackWho\Traits\CreatedBy;
 use UnexpectedValueException;
 
-class Export extends Model implements Attachable, IOOperation
+class Export extends Model implements
+    Attachable,
+    IOOperation,
+    CascadesFileDeletion
 {
     use CreatedBy, HasFactory;
 
@@ -40,6 +44,11 @@ class Export extends Model implements Attachable, IOOperation
     public function file(): Relation
     {
         return $this->belongsTo(File::class);
+    }
+
+    public static function cascadeDeletion(File $file): void
+    {
+        self::whereFileId($file->id)->get()->delete();
     }
 
     public function cancel(): void
