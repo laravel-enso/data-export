@@ -125,7 +125,7 @@ class ExcelExport
         $max = $this->exporter instanceof CustomMax
             ? $this->exporter->max()
             : $query->max($primaryKey);
-        \Log::info($max);
+
         $from = 0;
 
         while ($from <= $max) {

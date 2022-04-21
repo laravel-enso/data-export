@@ -173,7 +173,11 @@ class Export extends Model implements
             ->file()->associate($file)
             ->save();
 
-        $export->createdBy->notify((new ExportDone($export))
+        $subject = method_exists($exporter, 'emailSubject')
+            ? $exporter->emailSubject($export)
+            : __(':name export done', ['name' => $export->name]);
+
+        $export->createdBy->notify((new ExportDone($export, $subject))
             ->onQueue('notifications'));
 
         return $export;
@@ -186,11 +190,34 @@ class Export extends Model implements
         $this->save();
     }
 
+    public function delete()
+    {
+        if (! Statuses::isDeletable($this->status)) {
+            throw Exception::deleteRunningExport();
+        }
+
+        $response = parent::delete();
+
+        $this->file?->delete();
+
+        return $response;
+    }
+
     public function scopeExpired(Builder $query): Builder
     {
         $retainFor = Config::get('enso.exports.retainFor');
         $expired = Carbon::today()->subDays($retainFor);
 
         return $query->where('created_at', '<', $expired);
+    }
+
+    public function scopeDeletable(Builder $query): Builder
+    {
+        return $query->whereIn('status', Statuses::deletable());
+    }
+
+    public function scopeNotDeletable(Builder $query): Builder
+    {
+        return $query->whereNotIn('status', Statuses::deletable());
     }
 }

@@ -22,6 +22,16 @@ class Statuses extends Enum
 
     public static function running(): array
     {
-        return [static::Waiting, static::Processing];
+        return [self::Waiting, self::Processing];
+    }
+
+    public static function deletable(): array
+    {
+        return [self::Finalized, self::Cancelled, self::Failed];
+    }
+
+    public static function isDeletable(int $status): bool
+    {
+        return in_array($status, self::deletable());
     }
 }
