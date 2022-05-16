@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "box/spout": "^4.0",
+        "box/spout": "^3.0",
         "laravel-enso/core": "^8.0",
         "laravel-enso/enums": "^2.0",
         "laravel-enso/helpers": "^2.0",
