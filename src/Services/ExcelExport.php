@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
 use LaravelEnso\DataExport\Contracts\BeforeHook;
-use LaravelEnso\DataExport\Contracts\CustomMax;
 use LaravelEnso\DataExport\Contracts\CustomRowAction;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
@@ -115,30 +114,13 @@ class ExcelExport
 
     private function addRows(): self
     {
-        $query = $this->exporter->query()
-            ->select($this->exporter->attributes());
-
         $optimalChunk = OptimalChunk::get($this->export->total, $this->rowLimit);
+        $iterator = new Iterator($this->exporter, $optimalChunk);
         $this->currentChunk = 0;
-        $primaryKey = $query->getModel()->getKeyName();
 
-        $max = $this->exporter instanceof CustomMax
-            ? $this->exporter->max()
-            : $query->max($primaryKey);
-
-        $from = 0;
-
-        while ($from <= $max) {
-            $to = $from + $optimalChunk;
-
-            $chunk = $query->clone()
-                ->where($primaryKey, '>', $from)
-                ->where($primaryKey, '<=', $to)
-                ->get();
-
-            $this->addChunk($chunk);
-
-            $from = $to;
+        while ($iterator->valid()) {
+            $this->addChunk($iterator->current());
+            $iterator->next();
         }
 
         return $this;

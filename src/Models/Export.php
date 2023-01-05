@@ -122,6 +122,7 @@ class Export extends Model implements
         if ($exporter instanceof AsyncExcel) {
             return self::asyncExcel($exporter);
         }
+
         if ($exporter instanceof SyncExcel) {
             return self::syncExcel($exporter);
         }
