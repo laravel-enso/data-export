@@ -49,15 +49,19 @@ class Iterator
 
     private function min(): int
     {
-        return $this->exporter instanceof CustomMin
+        $min = $this->exporter instanceof CustomMin
             ? $this->exporter->min()
             : $this->query->min($this->primaryKey);
+
+        return $min ?? 1;
     }
 
     private function max(): int
     {
-        return $this->exporter instanceof CustomMax
+        $max = $this->exporter instanceof CustomMax
             ? $this->exporter->max()
             : $this->query->max($this->primaryKey);
+
+        return $max ?? 0;
     }
 }
