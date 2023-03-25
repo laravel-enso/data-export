@@ -22,7 +22,7 @@ class Iterator
         $this->query = $this->exporter->query()
             ->select($this->exporter->attributes());
 
-        $this->primaryKey = $this->query->getModel()->getKeyName();
+        $this->primaryKey = $this->query->getModel()->getQualifiedKeyName();
     }
 
     public function valid(): bool
