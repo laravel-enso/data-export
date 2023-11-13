@@ -167,7 +167,11 @@ class Export extends Model implements
 
         Storage::move($location, Type::for(self::class)->path($filename));
 
-        $args = [$export, $filename, $exporter->filename(), $export->created_by];
+        $args = [
+            $export, $filename, $exporter->filename(),
+            $export->getAttribute('created_by'),
+        ];
+
         $file = File::attach(...$args);
 
         $export->fill(['status' => Statuses::Finalized])

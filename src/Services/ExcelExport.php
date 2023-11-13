@@ -175,8 +175,8 @@ class ExcelExport
         $this->closeWriter();
 
         $args = [
-            $this->export, $this->savedName,
-            $this->exporter->filename(), $this->export->created_by,
+            $this->export, $this->savedName, $this->exporter->filename(),
+            $this->export->getAttribute('created_by'),
         ];
 
         $file = File::attach(...$args);
