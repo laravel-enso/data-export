@@ -154,7 +154,11 @@ class Export extends Model implements
             'total' => 0,
         ]);
 
-        $export->createdBy->notify((new ExportStarted($export->name))
+        $notifiables = method_exists($exporter, 'notifiables')
+            ? $exporter->notifiables($export)
+            : Collection::wrap($export->createdBy);
+
+        $notifiables->each->notify((new ExportStarted($export->name))
             ->onQueue('notifications'));
 
         $count = Collection::wrap($exporter->sheets())
@@ -182,7 +186,7 @@ class Export extends Model implements
             ? $exporter->emailSubject($export)
             : __(':name export done', ['name' => $export->name]);
 
-        $export->createdBy->notify((new ExportDone($export, $subject))
+        $notifiables->each->notify((new ExportDone($export, $subject))
             ->onQueue('notifications'));
 
         return $export;
