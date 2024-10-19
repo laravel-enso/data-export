@@ -2,10 +2,6 @@
 
 namespace LaravelEnso\DataExport\Services;
 
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
-use Box\Spout\Writer\XLSX\Writer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +18,8 @@ use LaravelEnso\DataExport\Notifications\ExportError;
 use LaravelEnso\Files\Models\File;
 use LaravelEnso\Files\Models\Type;
 use LaravelEnso\Helpers\Services\OptimalChunk;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Writer;
 use Throwable;
 
 class ExcelExport
@@ -82,14 +80,9 @@ class ExcelExport
 
     private function initWriter(): self
     {
-        $this->writer = WriterEntityFactory::createXLSXWriter();
+        $this->writer = new Writer();
 
-        $defaultStyle = (new StyleBuilder())
-            ->setShouldWrapText(false)
-            ->build();
-
-        $this->writer->setDefaultRowStyle($defaultStyle)
-            ->openToFile(Storage::path($this->path()));
+        $this->writer->openToFile(Storage::path($this->path()));
 
         return $this;
     }
@@ -153,9 +146,9 @@ class ExcelExport
         $this->currentSheet++;
     }
 
-    private function row($row): Row
+    private function row(array $row): Row
     {
-        return WriterEntityFactory::createRowFromArray($row);
+        return new Row($row);
     }
 
     private function addSheet(): void

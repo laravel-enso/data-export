@@ -2,7 +2,7 @@
 
 namespace LaravelEnso\DataExport\Contracts;
 
-use Box\Spout\Writer\XLSX\Writer;
+use OpenSpout\Writer\XLSX\Writer;
 
 interface CustomRowAction
 {
