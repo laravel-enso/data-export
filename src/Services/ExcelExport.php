@@ -148,7 +148,7 @@ class ExcelExport
 
     private function row(array $row): Row
     {
-        return new Row($row);
+        return Row::fromValues($row);
     }
 
     private function addSheet(): void
