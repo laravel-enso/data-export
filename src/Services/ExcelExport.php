@@ -11,7 +11,7 @@ use LaravelEnso\DataExport\Contracts\BeforeHook;
 use LaravelEnso\DataExport\Contracts\CustomRowAction;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
-use LaravelEnso\DataExport\Enums\Statuses;
+use LaravelEnso\DataExport\Enums\Status;
 use LaravelEnso\DataExport\Models\Export;
 use LaravelEnso\DataExport\Notifications\ExportDone;
 use LaravelEnso\DataExport\Notifications\ExportError;
@@ -89,7 +89,7 @@ class ExcelExport
 
     private function start(): self
     {
-        $this->export->update(['status' => Statuses::Processing]);
+        $this->export->update(['status' => Status::Processing->value]);
 
         return $this;
     }
@@ -174,7 +174,7 @@ class ExcelExport
 
         $file = File::attach(...$args);
 
-        $this->export->fill(['status' => Statuses::Finalized])
+        $this->export->fill(['status' => Status::Finalized->value])
             ->file()->associate($file)
             ->save();
 
@@ -243,7 +243,7 @@ class ExcelExport
 
     private function failed(): void
     {
-        $this->export->update(['status' => Statuses::Failed]);
+        $this->export->update(['status' => Status::Failed->value]);
         Storage::delete($this->path());
         $this->notifyError();
         $this->closeWriter();
