@@ -3,7 +3,7 @@
 namespace LaravelEnso\DataExport\Commands;
 
 use Illuminate\Console\Command;
-use LaravelEnso\DataExport\Enums\Statuses;
+use LaravelEnso\DataExport\Enums\Status;
 use LaravelEnso\DataExport\Models\Export;
 
 class Purge extends Command
@@ -15,7 +15,7 @@ class Purge extends Command
     public function handle()
     {
         Export::expired()->notDeletable()
-            ->update(['status' => Statuses::Cancelled]);
+            ->update(['status' => Status::Cancelled->value]);
 
         Export::expired()->deletable()->get()->each->delete();
     }
