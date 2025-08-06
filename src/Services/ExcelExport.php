@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\AfterHook;
 use LaravelEnso\DataExport\Contracts\BeforeHook;
 use LaravelEnso\DataExport\Contracts\CustomRowAction;
+use LaravelEnso\DataExport\Contracts\CustomSheetName;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Contracts\Notifies;
 use LaravelEnso\DataExport\Enums\Statuses;
@@ -31,6 +32,7 @@ class ExcelExport
     private Writer $writer;
     private int $currentChunk;
     private int $currentSheet;
+    private int $sheetCount;
 
     public function __construct(
         private Export $export,
@@ -38,6 +40,7 @@ class ExcelExport
     ) {
         $this->savedName = $this->savedName();
         $this->rowLimit = Config::get('enso.exports.rowLimit');
+        $this->sheetCount = 1;
     }
 
     public function handle()
@@ -83,6 +86,8 @@ class ExcelExport
         $this->writer = new Writer();
 
         $this->writer->openToFile(Storage::path($this->path()));
+
+        $this->setSheetNameIfNeeded();
 
         return $this;
     }
@@ -154,7 +159,23 @@ class ExcelExport
     private function addSheet(): void
     {
         $this->writer->addNewSheetAndMakeItCurrent();
+        $this->sheetCount++;
+        $this->setSheetNameIfNeeded();
+
         $this->addHeading();
+    }
+
+    private function setSheetNameIfNeeded(): void
+    {
+        if ($this->exporter instanceof CustomSheetName) {
+            $sheetName = $this->exporter->sheetName();
+
+            if ($this->sheetCount > 1) {
+                $sheetName .= $this->sheetCount;
+            }
+
+            $this->writer->getCurrentSheet()->setName($sheetName);
+        }
     }
 
     private function updateProgress(): void
