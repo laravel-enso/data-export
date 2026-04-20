@@ -13,7 +13,7 @@ class ExportFactory extends Factory
     public function definition()
     {
         return [
-            'name' => null,
+            'name' => "{$this->faker->uuid}.xlsx",
             'entries' => 0,
             'total' => 0,
             'status' => Statuses::Waiting,

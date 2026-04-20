@@ -14,9 +14,11 @@ class Purge extends Command
 
     public function handle()
     {
+        $deletableExports = Export::expired()->deletable()->pluck('id');
+
         Export::expired()->notDeletable()
             ->update(['status' => Statuses::Cancelled]);
 
-        Export::expired()->deletable()->get()->each->delete();
+        Export::whereKey($deletableExports)->get()->each->delete();
     }
 }
