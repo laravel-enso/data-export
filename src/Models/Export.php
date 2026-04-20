@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelEnso\DataExport\Contracts\CustomCount;
 use LaravelEnso\DataExport\Contracts\ExportsExcel as AsyncExcel;
-use LaravelEnso\DataExport\Enums\Statuses;
+use LaravelEnso\DataExport\Enums\Status;
 use LaravelEnso\DataExport\Exceptions\Exception;
 use LaravelEnso\DataExport\Notifications\ExportDone;
 use LaravelEnso\DataExport\Services\ExcelExport as AsyncExporter;
@@ -57,39 +57,39 @@ class Export extends Model implements
             throw Exception::cannotBeCancelled();
         }
 
-        $this->update(['status' => Statuses::Cancelled]);
+        $this->update(['status' => Status::Cancelled->value]);
     }
 
     public function cancelled(): bool
     {
-        return $this->status === Statuses::Cancelled;
+        return $this->status === Status::Cancelled->value;
     }
 
     public function failed(): bool
     {
-        return $this->status === Statuses::Failed;
+        return $this->status === Status::Failed->value;
     }
 
     public function running(): bool
     {
-        return in_array($this->status, Statuses::running());
+        return Status::from($this->status)->isRunning();
     }
 
     public function finalized(): bool
     {
-        return $this->status === Statuses::Finalized;
+        return $this->status === Status::Finalized->value;
     }
 
     public function operationType(): int
     {
-        return IOTypes::Export;
+        return IOTypes::Export; //TODO upgrade when IO package is upgraded
     }
 
     public function status(): int
     {
         return $this->running()
             ? $this->status
-            : Statuses::Finalized;
+            : Status::Finalized->value;
     }
 
     public function progress(): ?int
@@ -150,7 +150,7 @@ class Export extends Model implements
     {
         $export = self::factory()->create([
             'name' => $exporter->filename(),
-            'status' => Statuses::Processing,
+            'status' => Status::Processing->value,
             'total' => 0,
         ]);
 
@@ -178,7 +178,7 @@ class Export extends Model implements
 
         $file = File::attach(...$args);
 
-        $export->fill(['status' => Statuses::Finalized])
+        $export->fill(['status' => Status::Finalized->value])
             ->file()->associate($file)
             ->save();
 
@@ -201,7 +201,7 @@ class Export extends Model implements
 
     public function delete()
     {
-        if (! Statuses::isDeletable($this->status)) {
+        if (! Status::from($this->status)->isDeletable()) {
             throw Exception::deleteRunningExport();
         }
 
@@ -222,11 +222,11 @@ class Export extends Model implements
 
     public function scopeDeletable(Builder $query): Builder
     {
-        return $query->whereIn('status', Statuses::deletable());
+        return $query->whereIn('status', Status::deletable());
     }
 
     public function scopeNotDeletable(Builder $query): Builder
     {
-        return $query->whereNotIn('status', Statuses::deletable());
+        return $query->whereNotIn('status', Status::deletable());
     }
 }
