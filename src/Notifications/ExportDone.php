@@ -13,7 +13,8 @@ use LaravelEnso\DataExport\Models\Export;
 
 class ExportDone extends Notification implements ShouldQueue
 {
-    use Dispatchable, Queueable;
+    use Dispatchable;
+    use Queueable;
 
     public function __construct(
         private Export $export,
@@ -41,7 +42,7 @@ class ExportDone extends Notification implements ShouldQueue
         return (new MailMessage())
             ->subject("[ {$appName} ] {$this->subject}")
             ->markdown('laravel-enso/data-export::emails.export', [
-                'name' => $notifiable->person->appellative(),
+                'name'   => $notifiable->person->appellative(),
                 'export' => $this->export,
             ]);
     }

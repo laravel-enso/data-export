@@ -109,12 +109,12 @@ class ExportTest extends TestCase
     {
         $emptyExport = Export::factory()->create([
             'entries' => 0,
-            'total' => 0,
+            'total'   => 0,
         ]);
 
         $startedExport = Export::factory()->create([
             'entries' => 25,
-            'total' => 50,
+            'total'   => 50,
         ]);
 
         $this->assertNull($emptyExport->progress());
@@ -142,13 +142,13 @@ class ExportTest extends TestCase
         Config::set('enso.exports.retainFor', 1);
 
         $expiredRunning = Export::factory()->create([
-            'status' => Statuses::Processing,
+            'status'     => Statuses::Processing,
             'created_at' => now()->subDays(3),
             'updated_at' => now()->subDays(3),
         ]);
 
         $expiredFinalized = Export::factory()->create([
-            'status' => Statuses::Finalized,
+            'status'     => Statuses::Finalized,
             'created_at' => now()->subDays(3),
             'updated_at' => now()->subDays(3),
         ]);
@@ -157,7 +157,7 @@ class ExportTest extends TestCase
         $expiredFinalized->file()->associate($file)->save();
 
         $freshExport = Export::factory()->create([
-            'status' => Statuses::Finalized,
+            'status'     => Statuses::Finalized,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
