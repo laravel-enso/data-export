@@ -62,6 +62,6 @@ class Iterator
             ? $this->exporter->max()
             : $this->query->max($this->primaryKey);
 
-        return $max;
+        return $max ?? 0;
     }
 }
