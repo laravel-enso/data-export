@@ -49,6 +49,7 @@ class ExcelExport
             $this->export();
         } catch (Throwable $throwable) {
             $this->failed();
+
             throw $throwable;
         }
 
