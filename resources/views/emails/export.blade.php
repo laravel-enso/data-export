@@ -1,4 +1,8 @@
 @component('mail::message')
+@component('mail::title')
+{{ __('Data export ready') }}
+@endcomponent
+
 {{ __('Hi :name', ['name' => $name]) }},
 
 {{ __('The :filename file is ready', [
@@ -9,10 +13,10 @@
     'entries' => $export->entries
 ]) }}.
 
-@component('mail::button', ['url' => $export->file->temporaryLink()])
-@lang('Download')
+@component('mail::file', ['meta' => __(':entries entries', ['entries' => $export->entries])])
+{{ $export->file->original_name }}
 @endcomponent
 
-{{ __('Thank you') }},<br>
-{{ __(config('app.name')) }}
+@component('mail::signature')
+@endcomponent
 @endcomponent

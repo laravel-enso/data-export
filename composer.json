@@ -23,6 +23,7 @@
         "laravel-enso/enums": "^3.0",
         "laravel-enso/helpers": "^4.0",
         "laravel-enso/io": "^2.0",
+        "laravel-enso/mails": "^1.0",
         "laravel-enso/files": "^5.7",
         "laravel-enso/track-who": "^3.0"
     },
@@ -37,7 +38,8 @@
             "providers": [
                 "LaravelEnso\\DataExport\\AppServiceProvider",
                 "LaravelEnso\\DataExport\\AuthServiceProvider",
-                "LaravelEnso\\DataExport\\EnumServiceProvider"
+                "LaravelEnso\\DataExport\\EnumServiceProvider",
+                "LaravelEnso\\DataExport\\MailServiceProvider"
             ]
         }
     }
