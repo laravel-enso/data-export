@@ -8,6 +8,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Lang;
 use LaravelEnso\DataExport\Models\Export;
 
 class ExportError extends Notification implements ShouldQueue
@@ -18,7 +19,7 @@ class ExportError extends Notification implements ShouldQueue
 
     public function __construct(private Export $export)
     {
-        $this->subject ??= __('Export error');
+        $this->subject ??= Lang::get('Export error');
     }
 
     public function via()
@@ -30,7 +31,7 @@ class ExportError extends Notification implements ShouldQueue
     {
         return (new BroadcastMessage($this->toArray() + [
             'level' => 'error',
-            'title' => __('Export error'),
+            'title' => Lang::get('Export error'),
         ]))->onQueue($this->queue);
     }
 
@@ -40,9 +41,12 @@ class ExportError extends Notification implements ShouldQueue
 
         return (new MailMessage())
             ->subject("[ {$appName} ] {$this->subject}")
-            ->line(__('An error was encountered while generationg :export', [
-                'export' => $this->export->name,
-            ]));
+            ->markdown('laravel-enso/data-export::emails.error', [
+                'export' => $this->export,
+                'message' => Lang::get('An error was encountered while generating :export', [
+                    'export' => $this->export->name,
+                ]),
+            ]);
     }
 
     public function toArray()

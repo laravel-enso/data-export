@@ -31,5 +31,18 @@ class MailServiceProvider extends ServiceProvider
             ],
             section: PreviewDefinition::Core,
         ));
+
+        $registry->register(new PreviewDefinition(
+            key: 'data-export-error',
+            name: 'Data Export Error',
+            view: 'laravel-enso/data-export::emails.error',
+            data: [
+                'export' => new class {
+                    public string $name = 'users-export.xlsx';
+                },
+                'message' => 'An error was encountered while generating users-export.xlsx',
+            ],
+            section: PreviewDefinition::Core,
+        ));
     }
 }
