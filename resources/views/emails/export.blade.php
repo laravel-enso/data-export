@@ -13,7 +13,10 @@
     'entries' => $export->entries
 ]) }}.
 
-@component('mail::file', ['meta' => __(':entries entries', ['entries' => $export->entries])])
+@component('mail::file', [
+    'meta' => __(':entries entries', ['entries' => $export->entries]),
+    'url' => $export->file->temporaryLink(),
+])
 {{ $export->file->original_name }}
 @endcomponent
 

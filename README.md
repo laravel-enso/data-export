@@ -53,7 +53,7 @@ The package schedules `enso:data-export:purge` daily.
 - Synchronous export support for classic Enso Excel exporters.
 - Export progress tracking and IO broadcasting support.
 - File attachment and cleanup integration through `laravel-enso/files`.
-- Shared mail layout and preview registration through `laravel-enso/mails`.
+- Shared mail layout and preview registration through `laravel-enso/mails`, including a download link for finalized files.
 - Hooks for setup, teardown, custom notifications, custom row actions, and custom sheet names.
 - Cancel endpoint and automatic retention purge.
 
