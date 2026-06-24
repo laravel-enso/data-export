@@ -11,13 +11,15 @@ class Statuses extends Enum
     public const Finalized = 30;
     public const Cancelled = 40;
     public const Failed = 50;
+    public const Retained = 60;
 
     protected static array $data = [
-        self::Waiting    => 'waiting',
+        self::Waiting => 'waiting',
         self::Processing => 'processing',
-        self::Finalized  => 'finalized',
-        self::Cancelled  => 'cancelled',
-        self::Failed     => 'failed',
+        self::Finalized => 'finalized',
+        self::Cancelled => 'cancelled',
+        self::Failed => 'failed',
+        self::Retained => 'retained',
     ];
 
     public static function running(): array
