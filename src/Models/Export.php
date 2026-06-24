@@ -54,7 +54,7 @@ class Export extends Model implements
 
     public function cancel(): void
     {
-        if (!$this->running()) {
+        if (! $this->running()) {
             throw Exception::cannotBeCancelled();
         }
 
@@ -95,7 +95,7 @@ class Export extends Model implements
 
     public function progress(): ?int
     {
-        if (!$this->total) {
+        if (! $this->total) {
             return null;
         }
 
@@ -107,9 +107,9 @@ class Export extends Model implements
     public function broadcastWith(): array
     {
         return [
-            'name'    => $this->name,
+            'name' => $this->name,
             'entries' => $this->entries,
-            'total'   => $this->total,
+            'total' => $this->total,
         ];
     }
 
@@ -136,7 +136,7 @@ class Export extends Model implements
     private static function asyncExcel(AsyncExcel $exporter): self
     {
         $export = self::factory()->create([
-            'name'  => $exporter->filename(),
+            'name' => $exporter->filename(),
             'total' => $exporter instanceof CustomCount
                 ? $exporter->count()
                 : $exporter->query()->count(),
@@ -150,9 +150,9 @@ class Export extends Model implements
     private static function syncExcel(SyncExcel $exporter): self
     {
         $export = self::factory()->create([
-            'name'   => $exporter->filename(),
+            'name' => $exporter->filename(),
             'status' => Statuses::Processing,
-            'total'  => 0,
+            'total' => 0,
         ]);
 
         $notifiables = method_exists($exporter, 'notifiables')
@@ -202,7 +202,7 @@ class Export extends Model implements
 
     public function delete()
     {
-        if (!Statuses::isDeletable($this->status)) {
+        if (! Statuses::isDeletable($this->status)) {
             throw Exception::deleteRunningExport();
         }
 
@@ -218,7 +218,9 @@ class Export extends Model implements
         $retainFor = Config::get('enso.exports.retainFor');
         $expired = Carbon::today()->subDays($retainFor);
 
-        return $query->where('created_at', '<', $expired);
+        return $query
+            ->where('status', '!=', Statuses::Retained)
+            ->where('created_at', '<', $expired);
     }
 
     public function scopeDeletable(Builder $query): Builder
