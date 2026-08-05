@@ -18,7 +18,6 @@ use LaravelEnso\DataExport\Notifications\ExportDone;
 use LaravelEnso\DataExport\Notifications\ExportError;
 use LaravelEnso\Files\Models\File;
 use LaravelEnso\Files\Models\Type;
-use LaravelEnso\Helpers\Services\OptimalChunk;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
 use Throwable;
@@ -113,8 +112,7 @@ class ExcelExport
 
     private function addRows(): self
     {
-        $optimalChunk = OptimalChunk::get($this->export->total, $this->rowLimit);
-        $iterator = new Iterator($this->exporter, $optimalChunk);
+        $iterator = new Iterator($this->exporter);
         $this->currentChunk = 0;
 
         while ($iterator->valid()) {
@@ -130,7 +128,7 @@ class ExcelExport
         if ($this->export->fresh()->cancelled()) {
             return false;
         } else {
-            $rows->each(fn ($row) => $this->addRow($row));
+            $rows->each(fn($row) => $this->addRow($row));
 
             $this->updateProgress();
         }
@@ -190,7 +188,9 @@ class ExcelExport
         $this->closeWriter();
 
         $args = [
-            $this->export, $this->savedName, $this->exporter->filename(),
+            $this->export,
+            $this->savedName,
+            $this->exporter->filename(),
             $this->export->getAttribute('created_by'),
         ];
 

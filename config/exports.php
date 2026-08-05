@@ -14,6 +14,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Optimal chunk
+    |--------------------------------------------------------------------------
+    |
+    | Sets the maximum number of records loaded in memory for an export chunk.
+    |
+     */
+
+    'optimalChunk' => env('EXPORT_OPTIMAL_CHUNK', 5000),
+
+    /*
+    |--------------------------------------------------------------------------
     | Retain exports for a number of days
     |--------------------------------------------------------------------------
     | The default period in days for retaining exports. Is used by the
