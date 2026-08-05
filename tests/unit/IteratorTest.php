@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use LaravelEnso\DataExport\Contracts\CustomChunkSize;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\DataExport\Models\Export;
 use LaravelEnso\DataExport\Services\Iterator;
@@ -17,7 +18,12 @@ class IteratorTest extends TestCase
     {
         $exports = Export::factory()->count(3)->create()->sortBy('id');
         config(['enso.exports.optimalChunk' => 1]);
-        $iterator = new Iterator(new class implements ExportsExcel {
+        $iterator = new Iterator(new class implements CustomChunkSize, ExportsExcel {
+            public function chunkSize(): int
+            {
+                return 1;
+            }
+
             public function filename(): string
             {
                 return 'iterator';

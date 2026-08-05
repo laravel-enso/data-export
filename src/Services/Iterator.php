@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use InvalidArgumentException;
 use LaravelEnso\DataExport\Contracts\CustomMax;
 use LaravelEnso\DataExport\Contracts\CustomMin;
+use LaravelEnso\DataExport\Contracts\CustomChunkSize;
 use LaravelEnso\DataExport\Contracts\ExportsExcel;
 use LaravelEnso\Helpers\Services\OptimalChunk;
 
@@ -27,7 +28,9 @@ class Iterator
             ->select($this->exporter->attributes());
 
         $this->primaryKey = $this->query->getModel()->getQualifiedKeyName();
-        $this->chunkLimit = Config::get('enso.exports.optimalChunk');
+        $this->chunkLimit = $this->exporter instanceof CustomChunkSize
+            ? $this->exporter->chunkSize()
+            : Config::get('enso.exports.optimalChunk');
 
         if ($this->chunkLimit < 1) {
             throw new InvalidArgumentException('The configured export optimal chunk must be positive');
